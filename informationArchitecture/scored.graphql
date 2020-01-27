@@ -1,0 +1,124 @@
+
+
+interface IGame {
+  id: ID!
+  name: String
+  direction: PlayDirection
+  endMode: EndMode!
+  minScore: Int
+  maxScore: Int
+  playOrder: PlayOrder!
+  players: [Player!]!
+  round:
+  timeStart: Int!
+  timeTotalPlay: Int!
+  timePaused: Int!
+}
+
+type Game implements IGame {
+  id: ID!
+  name: String
+
+  currentTurn: ActiveTurn
+  clockwise: Bool!
+  endMode: EndMode!
+  isPaused: Bool!
+  minScore: Int
+  maxScore: Int
+  players: [Player!]!
+  playOrder: PlayOrder!
+  round: {
+    current: Round!
+    previous: Round
+  }
+  timeStart: Int!
+  timeTotalPlay: Int!
+  timePaused: Int!
+}
+
+type StoredGame implements IGame {
+  name: String
+  direction: PlayDirection
+  endMode: EndMode!
+  minScore: Int
+  maxScore: Int
+  players: [Player!]!
+  playOrder: PlayOrder!
+  scores: [StoredTurn!]!
+  round: {
+    final: Round!
+  }
+  timeStart: Int!
+  timeEnd: Int!
+  timeTotalPlay: Int!
+  timePaused: Int!
+}
+
+type Round {
+  id: ID
+  players: [Turn!]!
+  rank: {
+    thisRound: [RankItem]
+    game: [RankItem]
+  }
+}
+
+type ActiveTurn {
+  id: ID!
+  player: Player!
+  startTime: Int!
+  endTime: Int!
+  score: Int!
+}
+
+type StoredTurn {
+  id: ID!
+  round: Int!
+  score: Int!
+  rank: {
+    round: Int!
+    game: Int!
+  }
+  startTime: Int!
+  playTime: Int!
+}
+
+type Player {
+  id: ID!
+  name: String!
+  seatingPosition: Int!
+  score: {
+    current: ActiveTurn
+    previous: [StoredTurn!]!
+  }
+  currentRank: {
+    round: Int!
+    game: Int!
+  }
+  playTime: Int!
+}
+
+type RankItem {
+  player: Player.id
+  position: Int!
+  score: Int!
+}
+
+type PauseLog {
+  isPaused: boolean
+  time: Date
+}
+
+union Turn = ActiveTurn | StoredTurn
+
+enum PlayOrder {
+  "Seating position",
+  "Round winner",
+  "Trick"
+}
+
+enum EndMode {
+  "Current player",
+  "End of current round",
+  "Min/Max score"
+}
