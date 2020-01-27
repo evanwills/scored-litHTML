@@ -81,6 +81,7 @@ type StoredTurn {
   }
   startTime: Int!
   playTime: Int!
+  playPosition: Int!
 }
 
 type Player {
@@ -112,13 +113,13 @@ type PauseLog {
 union Turn = ActiveTurn | StoredTurn
 
 enum PlayOrder {
-  "Seating position",
-  "Round winner",
-  "Trick"
+  'Seating position',
+  'Round winner',
+  'Trick'
 }
 
 enum EndMode {
-  "Current player",
-  "End of current round",
-  "Min/Max score"
+  'Current player',
+  'End of current round',
+  'Min/Max score'
 }

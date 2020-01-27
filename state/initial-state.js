@@ -13,5 +13,6 @@ export const initialState = {
   previousRound: [],
   players: [],
   scores: [],
-  pauseLog: []
+  pauseLog: [],
+  pastGames: []
 }
