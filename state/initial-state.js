@@ -1,18 +1,32 @@
 
 export const initialState = {
-  currentTurn: null,
-  ended: false,
-  name: '',
-  clockwise: true,
-  endMode: 'Current player',
-  playOrder: 'Seating position',
-  start: null,
-  pausedDuration: 0,
-  isPaused: false,
-  currentRound: [],
-  previousRound: [],
-  players: [],
+  ended: null,
+  config: {
+    clockwise: true,
+    endMode: 'Current player',
+    name: '',
+    playOrder: 'Seating position',
+    trackTime: true
+  },
+  pastGames: [],
+  pause: {
+    start: null,
+    end: null,
+    isPaused: false,
+    last: 0,
+    total: 0,
+    log: []
+  },
   scores: [],
-  pauseLog: [],
-  pastGames: []
+  start: null,
+  players: {
+    index: 0,
+    all: []
+  },
+  round: {
+    index: 0,
+    currentTurn: null,
+    current: [],
+    previous: []
+  }
 }

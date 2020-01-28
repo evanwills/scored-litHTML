@@ -24,3 +24,4 @@ At the end of each round the `game` component *tells* each `player` component it
 * [Making a fullstack CRUD app with LitHTML, Redux, Express, and Webpack.](https://medium.com/@pascalschilp/making-a-fullstack-crud-app-with-lithtml-redux-express-and-webpack-fe7e5cf8b3ef)
 * [Using Redux in a LitElement app](https://vaadin.com/learn/tutorials/lit-element/state-management-with-redux)
 * [create-lit-app](https://github.com/thepassle/create-lit-app)
+* [lit-html + redux? #185](https://github.com/Polymer/lit-html/issues/185)
