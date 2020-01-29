@@ -1,5 +1,6 @@
-import GAME from '../actions/game'
-import TURN from '../actions/turns'
+import { GAME } from '../actions/game.action'
+import { TURN } from '../actions/turns.action'
+import { ErrorAction, StampedAction, StampedTimedAction } from '../types'
 
 /**
  * pauseResume() handles adding the paused time (in seconds) to
@@ -13,7 +14,12 @@ import TURN from '../actions/turns'
  * @param {Store} store Redux store
  */
 export const pauseResumeMiddleware = (store) => (next) => (action) => {
-  let newAction = {}
+  let newAction : StampedAction | StampedTimedAction | ErrorAction = {
+    type: '',
+    payload: {
+      now: null
+    }
+  }
   const currentStore = store.getState()
   switch (action.type) {
     case GAME.RESUME:
@@ -38,7 +44,7 @@ export const pauseResumeMiddleware = (store) => (next) => (action) => {
           type: GAME.PLAY_PAUSE_FAILURE,
           payload: {
             now: action.payload.now,
-            isPaused: false,
+            action: action,
             message: 'Resume failed because game was not paused',
             state: currentStore.pause
           }
@@ -53,7 +59,7 @@ export const pauseResumeMiddleware = (store) => (next) => (action) => {
           type: GAME.PLAY_PAUSE_FAILURE,
           payload: {
             now: action.payload.now,
-            isPaused: true,
+            action: action,
             message: 'Pause failed because game was already paused',
             state: currentStore.pause
           }

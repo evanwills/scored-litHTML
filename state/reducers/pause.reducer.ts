@@ -1,4 +1,4 @@
-import GAME from '../actions/game.js'
+import { GAME } from '../actions/game.action'
 
 const initialPause = {
   start: null,

@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
+    "module": "amd",
+    "out": "js/scored.js",
+    "sourceMap": true,
     "target": "es6",
-    "module": "commonjs",
-    "sourceMap": true
+    "allowJs": true
   }
 }

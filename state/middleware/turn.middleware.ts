@@ -1,4 +1,4 @@
-import { TURN, endTurnActionCreator } from '../actions/turn.action'
+import { TURN, endTurnActionCreator } from '../actions/turns.action'
 import { ROUND } from '../actions/round.action'
 
 export const turnMiddleWare = (store) => (next) => (action) => {
@@ -28,9 +28,9 @@ export const turnMiddleWare = (store) => (next) => (action) => {
     case TURN.END:
       if (round.turns.length === (players.all.length - 1)) {
         store.dispatch(action)
-        store.dispatch({
-          type:
-        })
+        // store.dispatch({
+        //   type:
+        // })
       }
       break
   }
