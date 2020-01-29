@@ -6,7 +6,7 @@
  *
  * @property {Date} now date object to be used
  */
-export const addNowToActionPayload = (store) => (next) => (action) => {
+export const addNowToPayloadMiddleware = (store) => (next) => (action) => {
   if (typeof action.now !== 'undefined') {
     return next(action)
   } else {

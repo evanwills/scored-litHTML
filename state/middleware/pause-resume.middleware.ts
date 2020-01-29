@@ -1,12 +1,24 @@
 import GAME from '../actions/game'
 import TURN from '../actions/turns'
 
-export const pauseResume = (store) => (next) => (action) => {
+/**
+ * pauseResume() handles adding the paused time (in seconds) to
+ * appropriate actions. It also intercepts bad pause/resume actions
+ * and kills them. Instead it creates a log only action for logging
+ * the problem.
+ *
+ * pauseResume() must be run after addNowToAction() middleware
+ * because it relies on the Date object added by that middleware.
+ *
+ * @param {Store} store Redux store
+ */
+export const pauseResumeMiddleware = (store) => (next) => (action) => {
   let newAction = {}
+  const currentStore = store.getState()
   switch (action.type) {
     case GAME.RESUME:
-      if (store.pause.start !== null && store.pause.isPaused === true) {
-        const seconds = Math.round((action.payload.now.getTime() - store.pause.start.getTime()) / 1000)
+      if (currentStore.pause.start !== null && currentStore.pause.isPaused === true) {
+        const seconds = Math.round((action.payload.now.getTime() - currentStore.pause.start.getTime()) / 1000)
         newAction = {
           ...action,
           payload: {
@@ -16,7 +28,7 @@ export const pauseResume = (store) => (next) => (action) => {
         }
         // dispatch an additional action to trigger unpausing of the
         // current turn
-        store.dispatch({
+        currentStore.dispatch({
           ...newAction,
           type: TURN.RESUME
         })
@@ -28,20 +40,22 @@ export const pauseResume = (store) => (next) => (action) => {
             now: action.payload.now,
             isPaused: false,
             message: 'Resume failed because game was not paused',
-            state: store.pause
+            state: currentStore.pause
           }
         }
       }
       return next(newAction)
+
     case GAME.PAUSE:
-      if (store.pause.isPaused === true || store.pause.start !== null || store.pause.end !== null) {
+      // Test if the action is valid and trigger a log event if not.
+      if (currentStore.pause.isPaused === true || currentStore.pause.start !== null || currentStore.pause.end !== null) {
         newAction = {
           type: GAME.PLAY_PAUSE_FAILURE,
           payload: {
             now: action.payload.now,
             isPaused: true,
             message: 'Pause failed because game was already paused',
-            state: store.pause
+            state: currentStore.pause
           }
         }
         return next(newAction)

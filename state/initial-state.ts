@@ -1,9 +1,12 @@
 
 export const initialState = {
-  ended: null,
+  end: null,
   config: {
+    allowNegative: false,
     clockwise: true,
     endMode: 'Current player',
+    minScore: 0,
+    maxScore: 0,
     name: '',
     playOrder: 'Seating position',
     trackTime: true
@@ -26,7 +29,7 @@ export const initialState = {
   round: {
     index: 0,
     currentTurn: null,
-    current: [],
+    turns: [],
     previous: []
   }
 }
