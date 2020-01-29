@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux'
+import { combineReducers } from '../../node_modules/redux/es/redux'
 import { pauseReducer } from './pause.reducer'
 import { roundReducer } from './round.reducer'
 
