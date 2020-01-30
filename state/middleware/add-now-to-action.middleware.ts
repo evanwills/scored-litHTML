@@ -1,49 +1,49 @@
-import { Action, StampedAction } from '../types'
+import { IAction, IActionStamped } from '../types'
 
 /**
- * Redux middleware addNowToAction() appends a "now" property to an
- * action's payload object before passing it to the next middleware.
+ * Redux middleware addNowToIAction() appends a "now" property to an
+ * Iaction's payload object before passing it to the next middleware.
  *
- * Most actions want a timestamp to allow for logging playing time.
+ * Most Iactions want a timestamp to allow for logging playing time.
  *
  * @property {Date} now date object to be used
  */
-export const addNowToPayloadMiddleware = (store) => (next) => (action : Action | StampedAction) => {
-  if (typeof (action as StampedAction).payload.now !== 'undefined') {
-    return next(action)
+export const addNowToPayloadMiddleware = (store) => (next) => (Iaction : IAction | IActionStamped) => {
+  if (typeof (Iaction as IActionStamped).payload.now !== 'undefined') {
+    return next(Iaction)
   } else {
-    const _now = new Date()
+    const _now : number = Date.now()
 
-    const actionKeys = Object.keys(action)
-    const payloadKeys = Object.keys(action.payload)
-    let _modifiedAction : StampedAction = {
+    const IactionKeys : string[] = Object.keys(Iaction)
+    const payloadKeys : string[] = Object.keys(Iaction.payload)
+    let _modifiedIAction : IActionStamped = {
       type: '',
       payload: {
         now: null
       }
     }
-    let actionKey = ''
+    let IactionKey = ''
     let payloadKey = ''
 
-    for (let i = 0; i < actionKeys.length; i += 1) {
-      actionKey = actionKeys[i]
-      if (actionKey !== 'payload') {
-        _modifiedAction[actionKey] = action[actionKey]
+    for (let i = 0; i < IactionKeys.length; i += 1) {
+      IactionKey = IactionKeys[i]
+      if (IactionKey !== 'payload') {
+        _modifiedIAction[IactionKey] = Iaction[IactionKey]
       } else {
         for (let j = 0; j < payloadKeys.length; j += 1) {
           payloadKey = payloadKeys[j]
-          _modifiedAction.payload[payloadKey] = action[payloadKey]
+          _modifiedIAction.payload[payloadKey] = Iaction[payloadKey]
         }
-        _modifiedAction.payload.now = _now // raw Date object
+        _modifiedIAction.payload.now = _now // raw Date object
       }
     }
 
-    if (typeof _modifiedAction.payload === 'undefined') {
-      _modifiedAction.payload = {
+    if (typeof _modifiedIAction.payload === 'undefined') {
+      _modifiedIAction.payload = {
         now: _now
       }
     }
 
-    store.dispatch(_modifiedAction)
+    store.dispatch(_modifiedIAction)
   }
 }

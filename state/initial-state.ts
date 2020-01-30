@@ -1,35 +1,20 @@
+import { IWholeScored, END_MODE, PLAY_ORDER } from './types'
 
-export const initialState = {
-  end: null,
-  config: {
+export const initialState : IWholeScored = {
+  allPlayers: {
+    index: 0,
+    players: []
+  },
+  currentGame: null,
+  defaultConfig: {
     allowNegative: false,
     clockwise: true,
-    endMode: 'Current player',
+    endMode: END_MODE.CURRENT_PLAYER,
     minScore: 0,
     maxScore: 0,
     name: '',
-    playOrder: 'Seating position',
+    playOrder: PLAY_ORDER.SEATING_POSTION,
     trackTime: true
   },
-  pastGames: [],
-  pause: {
-    start: null,
-    end: null,
-    isPaused: false,
-    last: 0,
-    total: 0,
-    log: []
-  },
-  scores: [],
-  start: null,
-  players: {
-    index: 0,
-    all: []
-  },
-  round: {
-    index: 0,
-    currentTurn: null,
-    turns: [],
-    previous: []
-  }
+  pastGames: []
 }

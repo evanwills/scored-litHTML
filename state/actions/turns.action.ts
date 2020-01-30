@@ -1,3 +1,4 @@
+import { IAction } from '../types'
 
 export const TURN = {
   START: 'START_TURN',
@@ -7,50 +8,41 @@ export const TURN = {
   RESUME: 'RESUME_TURN'
 }
 
-export const startTurnActionCreator = (playerID) => {
+export const startTurnActionCreator = () : IAction => {
   return {
     type: TURN.START,
-    payload: {
-      id: playerID
-    }
+    payload: {}
   }
 }
 
-export const pauseTurnActionCreator = (playerID, score) => {
+export const pauseTurnActionCreator = () : IAction => {
+  return {
+    type: TURN.PAUSE,
+    payload: {}
+  }
+}
+
+export const resumeTurnActionCreator = () : IAction => {
+  return {
+    type: TURN.RESUME,
+    payload: {}
+  }
+}
+
+export const scoreTurnActionCreator = (score : number) : IAction => {
   return {
     type: TURN.START,
     payload: {
-      id: playerID,
       score: score
     }
   }
 }
 
-export const resumeTurnActionCreator = (playerID, score) => {
+export const endTurnActionCreator = (total: number) : IAction => {
   return {
-    type: TURN.START,
+    type: TURN.END,
     payload: {
-      id: playerID,
-      score: score
-    }
-  }
-}
-
-export const scoreTurnActionCreator = (playerID, score) => {
-  return {
-    type: TURN.START,
-    payload: {
-      id: playerID,
-      score: score
-    }
-  }
-}
-
-export const endTurnActionCreator = (turn) => {
-  return {
-    type: TURN.START,
-    payload: {
-      turn: turn
+      totalScore: total
     }
   }
 }

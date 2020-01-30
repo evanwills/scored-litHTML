@@ -1,8 +1,14 @@
 export const PLAYER = {
-  ADD: 'ADD_PLAYER',
-  UPDATE: 'UPDATE_PLAYER',
-  SCORE_TURN: 'SCORE_TURN',
-  DELETE: 'DELETE_PLAYER'
+  ADD: 'Add player to game',
+  UPDATE: 'Update game player',
+  SCORE_TURN: 'Score turn',
+  DELETE: 'Remove player form game'
+}
+
+export const ALL_PLAYERS = {
+  ADD: 'Add new player',
+  UPDATE: 'Update player\'s name',
+  DELETE: 'Remove player from list'
 }
 
 export const addPlayerActionCreator = (_name, _position) => {
