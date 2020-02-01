@@ -1,30 +1,33 @@
+import { Reducer } from '../../node_modules/redux/index'
 import { GAME } from '../actions/game.action'
+import { IPause, IPauseLog, IPauseFailLog, IActionStamped, PAUSE_LOG_TYPE } from '../types'
 
-const initialPause = {
+const initialPause : IPause = {
   start: null,
   end: null,
   isPaused: false,
-  last: 0,
-  total: 0,
+  pauses: [],
+  totalPauseTime: 0,
   log: []
 }
 
-export const pauseReducer = (state = initialPause, action) => {
+export const pauseReducer : Reducer = (state : IPause = initialPause, action : IActionStamped ) : IPause => {
   switch (action.type) {
     case GAME.PAUSE:
       return {
         start: action.payload.now,
         end: null,
         isPaused: true,
-        last: state.last,
-        total: state.total,
         log: [
           ...state.log,
           {
-            type: 'start',
+            error: false,
+            mode: PAUSE_LOG_TYPE.PAUSE,
             time: action.payload.now
           }
-        ]
+        ],
+        pauses: state.pauses,
+        totalPauseTime: state.totalPauseTime,
       }
 
     case GAME.RESUME:
@@ -34,25 +37,25 @@ export const pauseReducer = (state = initialPause, action) => {
           start: null,
           end: null,
           isPaused: false,
-          last: pausedSeconds,
-          total: state.total + pausedSeconds,
           log: [
             ...state.log,
             {
-              type: 'end',
-              time: now,
-              duration: pausedSeconds
+              error: false,
+              mode: PAUSE_LOG_TYPE.RESUME,
+              time: now
             }
-          ]
+          ],
+          pauses: state.pauses,
+          totalPauseTime: state.totalPauseTime + pausedSeconds
         }
       } else {
         return {
           start: null,
           end: null,
           isPaused: false,
-          last: state.last,
-          total: state.total,
-          log: state.log
+          log: state.log,
+          pauses: state.pauses,
+          totalPauseTime: state.totalPauseTime
         }
       }
 
@@ -62,10 +65,10 @@ export const pauseReducer = (state = initialPause, action) => {
         log: [
           ...state.log,
           {
-            type: 'error',
+            error: true,
             time: action.payload.now,
             message: action.payload.message,
-            mode: (action.payload.isPaused) ? 'PAUSE' : 'RESUME'
+            mode: (action.payload.isPaused) ? PAUSE_LOG_TYPE.PAUSE : PAUSE_LOG_TYPE.RESUME
           }
         ]
       }

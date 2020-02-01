@@ -1,4 +1,5 @@
-import { ITurnComplete, IAction, SCORE_SORT_METHOD, FILTER_BY_PROP } from '../types'
+import { Reducer } from '../../node_modules/redux/index'
+import { IAction, IGetTurns, ITurnComplete, SCORE_SORT_METHOD, FILTER_BY_PROP } from '../types'
 import { pureSort, ICompare } from '../utilities/functional-sort'
 
 export const SCORE = {
@@ -11,7 +12,7 @@ export const SCORE = {
  *
  * @param id ID of the player whose scores we want to sum
  */
-const getTotalScoreReducer = (id : number) => (oldTotal:number, turn:ITurnComplete) => {
+const getTotalScoreReducer  = (id : number) => (oldTotal:number, turn:ITurnComplete) => {
   if (turn.playerID === id) {
     return oldTotal + turn.score.round
   } else {
@@ -20,11 +21,16 @@ const getTotalScoreReducer = (id : number) => (oldTotal:number, turn:ITurnComple
 }
 
 /**
- * get a callback function to be used by Array.sort()
+ * get a callback function that can be passed to Array.sort()
  *
  * @param whichScore which score should the sort be based on
  */
-const sortByScore = (whichScore : SCORE_SORT_METHOD = SCORE_SORT_METHOD.round) : ICompare => (turnA : ITurnComplete, turnB: ITurnComplete ) : number => {
+const sortByScore = (
+  whichScore : SCORE_SORT_METHOD = SCORE_SORT_METHOD.round
+) : ICompare => (
+  turnA : ITurnComplete,
+  turnB: ITurnComplete
+) : number => {
   if (turnA.score[whichScore] < turnB.score[whichScore]) {
     return -1
   } else if (turnA.score[whichScore] > turnB.score[whichScore]) {
@@ -35,12 +41,12 @@ const sortByScore = (whichScore : SCORE_SORT_METHOD = SCORE_SORT_METHOD.round) :
 }
 
 /**
- * get a callback function to be used by Array.filter()
+ * get a callback function that can be passed to Array.filter()
  *
  * @param whichType which type of score (ITurn) should be returned
  * @param id        row or player UID to filter by
  */
-const filterByType = (whichType : FILTER_BY_PROP, id: number) => (item: ITurnComplete) : boolean {
+const filterByType = (whichType : FILTER_BY_PROP, id: number) => (item: ITurnComplete) : boolean => {
   return (item[whichType] === id)
 }
 
@@ -66,7 +72,7 @@ const sortTurns = (
  * @param id        UID of the round to be retrieved
  * @param sortedBy  the order in which to retrieve the turns
  */
-export const getPlayerTurns = (
+export const getPlayerTurns : IGetTurns = (
   allScores: ITurnComplete[],
   id: number,
   sortedBy : SCORE_SORT_METHOD = SCORE_SORT_METHOD.order
@@ -86,7 +92,7 @@ export const getPlayerTurns = (
  * @param id        UID of the round to be retrieved
  * @param sortedBy  the order in which to retrieve the turns
  */
-export const getRoundTurns = (
+export const getRoundTurns : IGetTurns = (
   allScores: ITurnComplete[],
   id: number,
   sortedBy : SCORE_SORT_METHOD = SCORE_SORT_METHOD.order
@@ -110,7 +116,7 @@ export const getTotalScore = (allScores: ITurnComplete[], playerID : number) => 
 }
 
 
-export const scoresReducer = (state : ITurnComplete[] = [], action: IAction) => {
+export const scoresReducer : Reducer = (state : ITurnComplete[] = [], action: IAction) => {
   switch (action.type) {
     case SCORE.ADD:
       return [...state, ...action.payload.turns]

@@ -8,7 +8,10 @@
 export interface IAction {
   type: string,
   payload: IPayload,
-  dispatched?: boolean
+  error?: boolean,
+  meta?: {
+    dispatched?: boolean
+  }
 }
 
 export interface IActionError extends IAction {
@@ -21,18 +24,22 @@ export interface IActionStamped extends IAction {
   payload: IPayloadStamped
 }
 
-export interface IActionStampedTimed extends IAction {
-  type: string,
-  payload: IPayloadStampedTimed
-}
-
 //  END: action interfaces
 // ----------------------------------------------
 // START: config (Redux) slice interface
 
-export interface IConfig {
+export interface IConfigDefault {
   allowNegative: boolean,
-  clockwise: boolean,
+  endMode: END_MODE,
+  minScore?: number,
+  maxScore?: number,
+  name?: string,
+  playOrder: PLAY_ORDER,
+  trackTime: boolean
+}
+
+export interface IConfigGame {
+  allowNegative: boolean,
   endMode: END_MODE,
   minScore?: number,
   maxScore?: number,
@@ -52,36 +59,59 @@ export interface IConfig {
  * @property config  configuration information for the game
  * @property pause   information about the "pause" state of
  *                   the game
+ * @property players information about the players playing
+ *                   the current game
+ * @property results final status of the game.
+ * @property round   information about the current round of
+ *                   turns being played
  * @property scores  list of all the Turns taken so far in
  *                   the game in order of play
  * @property start   Timestamp for when the game started
- * @property players information about the players playing
- *                   the current game
- * @property round   information about the current round of
- *                   turns being played
  */
 export interface IGame {
   end: number,
-  config: IConfig,
+  config: IConfigGame,
   pause: IPause,
-  scores: ITurnComplete[],
-  start: number,
   players: IPlayers,
-  round?: IRound
-  results?: IPlayerResult[]
+  results?: IPlayerResult[],
+  round?: IRound,
+  scores: ITurnComplete[],
+  start: number
 }
 
+/**
+ * Games have rounds so an active game requires an IRound
+ * property to store info about the round currently being
+ * played
+ *
+ * @property round all the info needed to manage the current
+ *                 round of play
+ */
 export interface IGameActive {
-  round: IRound
+  end: number,
+  config: IConfigGame,
+  pause: IPause,
+  players: IPlayers,
+  round: IRound,
+  scores: ITurnComplete[],
+  start: number,
 }
 
 export interface IGameFinished {
-  results: IPlayerResult[]
+  end: number,
+  config: IConfigGame,
+  pause: IPause,
+  players: IPlayers,
+  results: IPlayerResult[],
+  scores: ITurnComplete[],
+  start: number
 }
+
 
 //  END:  game (Redux) slice intefaces
 // ----------------------------------------------
 // START: pause intefaces
+
 
 /**
  * Pause slice of game interface
@@ -102,7 +132,7 @@ export interface IPause {
   isPaused: boolean,
   pauses: number[],
   totalPauseTime: number,
-  log: IPauseLog[]
+  log: Array<IPauseLog|IPauseFailLog>
 }
 
 /**
@@ -118,7 +148,25 @@ export interface IPause {
 export interface IPauseLog {
   message?: string,
   time: number,
-  type: PAUSE_ACTION
+  mode: PAUSE_LOG_TYPE
+  error: boolean,
+}
+
+/**
+ * Log entry generated each time the game is paused or
+ * resumed
+ *
+ * @property message [optional] infomation about why the
+ *                   game was paused or resumed
+ * @property time    timestamp for when the game was paused
+ *                   or resumed
+ * @property type    either 'Pause' or 'Resume'
+ */
+export interface IPauseFailLog extends IPauseLog {
+  message: string,
+  time: number,
+  mode: PAUSE_LOG_TYPE
+  error: boolean
 }
 
 //  END:  pause interfaces
@@ -134,9 +182,11 @@ export interface IPayload {
   action?: IAction,
   dispatched?: boolean,
   id?: number,
+  isPaused?: boolean,
   now?: number,
   message?: string,
   name?: string,
+  pausedSeconds?: number,
   position?: number
   playOrder?: PLAY_ORDER,
   playersSeated?: IPlayerSimple[]
@@ -160,6 +210,7 @@ export interface IPayload {
  *                   effect the state
  */
 export interface IPayloadError extends IPayloadStamped {
+  now: number,
   message: string,
   code: number,
   state: object,
@@ -226,6 +277,11 @@ export interface IPlayers {
   // playerPositions: number[]
 }
 
+export interface IPlayersAll {
+  index: number,
+  players: IPlayerSimple[]
+}
+
 //  END:  player(s) interfaces
 // ----------------------------------------------
 
@@ -288,15 +344,19 @@ export interface ITurnComplete extends ITurn {
   playOrder: number,
   start: number,
   end: number,
-  score: {
-    round: number,
-    total: number
-  },
+  score: ITurnScore,
   pauseDuration: number,
-  rank: {
-    round: number,
-    overall: number
-  }
+  rank: ITurnRank
+}
+
+export interface ITurnScore {
+  round: number,
+  total?: number
+}
+
+export interface ITurnRank {
+  round: number,
+  overall: number
 }
 
 //  END:  turn interfaces
@@ -304,24 +364,41 @@ export interface ITurnComplete extends ITurn {
 
 
 export interface IWholeScored {
-  allPlayers: {
-    index: number,
-    players: IPlayerSimple[]
-  },
-  defaultConfig: IConfig
-  currentGame: IGame,
-  pastGames: IGame[],
+  allPlayers: IPlayersAll,
+  defaultConfig: IConfigDefault
+  currentGame: IGameActive,
+  pastGames: IGameFinished[],
 }
 
 
 //  END:  interface declarations
 // ========================================================
+// START: unions declarations
 
+export type SliceTypes = IConfigDefault | IConfigGame | IGame |
+                         IGame[] | IPause | IPlayers | IPlayersAll |
+                         IRound | IRoundTurns | ITurnComplete[] |
+                         ITurnRank | ITurnScore | number
+
+//  END:  unions declarations
+// ========================================================
 // START: function interfaces
 
 
-interface ICompare {
+export interface ICompare {
   (a : any, b: any) : number
+}
+
+export interface IGetTurns {
+  (
+    allScores: ITurnComplete[],
+    id: number,
+    sortedBy : SCORE_SORT_METHOD
+  ) : ITurnComplete[]
+}
+
+export interface Reducer {
+  (state : SliceTypes, action : IAction) : SliceTypes
 }
 
 
@@ -364,4 +441,9 @@ export enum SCORE_SORT_METHOD {
 export enum FILTER_BY_PROP {
   id,
   playerID
+}
+
+export enum PAUSE_LOG_TYPE {
+  PAUSE,
+  RESUME
 }

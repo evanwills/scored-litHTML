@@ -1,7 +1,8 @@
+import { Reducer } from '../../node_modules/redux/index'
 import { ROUND } from '../actions/round.action'
 import { TURN } from '../actions/turns.action'
 import { GAME } from '../actions/game.action'
-import { IAction, IRound, PLAY_ORDER, IPlayerSimple } from '../types'
+import { IAction, IRound, PLAY_ORDER, IPlayerSimple} from '../types'
 
 const initialRound : IRound = {
   index: 0,
@@ -73,7 +74,7 @@ const getPlayersInOrder = (
  * @param state the slice of redux state concerned with rounds
  * @param action any action passing through redux
  */
-export const roundReducer = (
+export const roundReducer : Reducer = (
   state : IRound = initialRound,
   action : IAction
 ) : IRound => {

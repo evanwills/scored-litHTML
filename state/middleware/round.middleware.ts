@@ -2,18 +2,24 @@ import { TURN, endTurnActionCreator, startTurnActionCreator } from '../actions/t
 import { ROUND, initialiseRoundActionCreator, finaliseRoundActionCreator } from '../actions/round.action'
 import { getTotalScore } from '../reducers/scores.reducer'
 import { IAction, IWholeScored } from '../types'
+import { Middleware, Store } from '../../node_modules/redux/index'
 
-export const roundMiddleWare = (store) => (next) => (action : IAction) => {
+export const roundMiddleWare : Middleware = (store : Store) => (next) => (action : IAction) => {
   const currentState : IWholeScored = store.getState()
   const { config, end, players, round, scores } = currentState.currentGame
 
   switch (action.type) {
     case TURN.SCORE:
       // We don't want an infinite loop so lets add
-      if (typeof action.dispatched === 'undefined') {
+      if (typeof action.meta.dispatched === 'undefined') {
         store.dispatch({
-          ...action,       // let myslef know I've seen this
-          dispatched: true // particular action before
+          type: action.type,
+          payload: action.payload,
+          error: action.error,
+          meta: {
+            ...action.meta,  // let myslef know I've seen this
+            dispatched: true // particular action before
+          }
         })
         // Now that the score has been processed, we can end the turn
 
