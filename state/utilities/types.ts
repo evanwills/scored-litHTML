@@ -367,7 +367,7 @@ export interface IPauseFailLog extends IPauseLog {
 export interface IPayload {
   action?: IAction,
   dispatched?: boolean,
-  errorType: errorType,
+  errorType?: errorType,
   id?: number,
   isPaused?: boolean
   message?: string,
@@ -377,7 +377,7 @@ export interface IPayload {
   playOrder?: PLAY_ORDER,
   playersSeated?: IPlayerPlaying[]
   score?: number,
-  state?: object,
+  state?: StateSlice,
   totalScore?: number,
   turn?: ITurnComplete,
   turns?: ITurnComplete[],
@@ -399,7 +399,7 @@ export interface IPayloadError extends IPayload {
   now: number,
   extraMessage: string,
   type: errorType,
-  state: object,
+  state: StateSlice,
   action: IAction
 }
 
@@ -573,7 +573,7 @@ export type IWholeScored = {
 // ========================================================
 // START: unions declarations
 
-export type SliceTypes = IConfigDefault | IConfigGame | IGame |
+export type StateSlice = IConfigDefault | IConfigGame | IGame |
                          IGame[] | IPause | gamePlayers | gamePlayersAll |
                          IRound | IRoundTurns | ITurnComplete[] |
                          ITurnRank | ITurnScore | number
@@ -596,7 +596,7 @@ export interface IGetTurns {
 }
 
 export interface IReducer {
-  (state : SliceTypes, action : IAction) : SliceTypes
+  (state : StateSlice, action : IAction) : StateSlice
 }
 
 

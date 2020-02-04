@@ -7,6 +7,12 @@ import { ALL_PLAYERS } from '../actions/player.action'
 export const gamePlayerReducer : Reducer = (state : gamePlayers , action: IAction) : gamePlayers => {
   return state
 }
+
+/**
+ * Handle adding/updating/deleting system player entries
+ * @param state
+ * @param action
+ */
 export const allPlayerReducer : Reducer = (state : gamePlayersAll , action: IAction) : gamePlayersAll => {
   switch (action.type) {
     case ALL_PLAYERS.ADD:
