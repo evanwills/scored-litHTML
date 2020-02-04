@@ -1,6 +1,6 @@
 import { TURN, endTurnAC, startTurnAC } from '../actions/turns.action'
 import { ROUND, initialiseRoundAC, finaliseRoundAC } from '../actions/round.action'
-import { getTotalScore } from '../reducers/scores.reducer'
+import { getTotalScore } from '../utilities/score.utils'
 import { IAction, IWholeScored } from '../types'
 import { Middleware, Store } from '../../node_modules/redux/index'
 

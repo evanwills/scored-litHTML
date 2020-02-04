@@ -1,6 +1,6 @@
 import { IAction } from "../types"
 
-export const PLAYER = {
+export const GAME_PLAYER = {
   ADD: 'Add player to game',
   UPDATE: 'Update game player\'s name',
   REARRANGE: 'Change the seating order of players',
@@ -15,7 +15,7 @@ export const ALL_PLAYERS = {
 
 export const addPlayerToGameAC = (_name, _position) : IAction => {
   return {
-    type: PLAYER.ADD,
+    type: GAME_PLAYER.ADD,
     payload: {
       name: _name,
       position: _position
@@ -25,7 +25,7 @@ export const addPlayerToGameAC = (_name, _position) : IAction => {
 
 export const updatePlayerAC = (_id, _name, _position) : IAction => {
   return {
-    type: PLAYER.UPDATE,
+    type: GAME_PLAYER.UPDATE,
     payload: {
       id: _id,
       name: _name,
@@ -44,7 +44,7 @@ export const addNewPlayerAC = (_name : string) => {
   return {
     type: ALL_PLAYERS.ADD,
     payload: {
-      score: _name
+      name: _name
     }
   }
 }
@@ -59,7 +59,7 @@ export const updateExistingPlayerAC = (_name : string) => {
   return {
     type: ALL_PLAYERS.UPDATE,
     payload: {
-      score: _name
+      name: _name
     }
   }
 }

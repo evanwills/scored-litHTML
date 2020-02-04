@@ -2,7 +2,7 @@ import { Reducer } from '../../node_modules/redux/index'
 import { ROUND } from '../actions/round.action'
 import { TURN } from '../actions/turns.action'
 import { GAME } from '../actions/game.action'
-import { sortTurns } from './scores.reducer'
+import { sortTurns } from '../utilities/score.utils'
 import { IAction, IRound, PLAY_ORDER, IPlayerPlaying, IRoundTurns, ITurn, ITurnComplete, SCORE_SORT_METHOD } from '../types'
 
 const initialRound : IRound = {
@@ -17,74 +17,12 @@ const initialRound : IRound = {
   }
 }
 
-/**
- * Get the index of the player who should start the next
- * round of play
- *
- * @param starterID ID of the player who should start this
- *                  round
- * @param players   List of all players in this game
- *                  (in seating order)
- * @param getNext   Don't return the index of the specified
- *                  player, return the index of the next
- *                  player in line.
- */
-const getStarterIndex = (starterID: number, players: IPlayerPlaying[], getNext : boolean = false) : number => {
-  for (let a = 0; a < players.length; a += 1) {
-    if (players[a].id === starterID) {
-      if (getNext === true || players[a].active === false) {
-        // find the next active player
-        for (let b = a + 1; b < players.length; b += 1) {
-          if (players[a].active === true) {
-            return b
-          }
-        }
-        // No active players at the end of the list so
-        // try to find the next active player from the
-        // beginning of the list
-        for (let b = 0; b < a; b += 1) {
-          if (players[b].active === true) {
-            return b
-          }
-        }
-      } else {
-        // We found the right player! Return their index
-        return a
-      }
-    }
-  }
-  // Something weird happened.
-  // Couldn't find any valid starter.
-  return 0
-}
 
-/**
- * Returns the players in the order they should play the next
- * round
- *
- * @param playersSeated players listed in their seating order
- *                      (based on their first round)
- * @param starterID     id of the player who should start the
- *                      next round
- */
-const getPlayersInOrder = (
-  playersSeated : IPlayerPlaying[],
-  starterID : number,
-  getNext : boolean = false
-) : IPlayerPlaying[] => {
-  const starterIndex = getStarterIndex(starterID, playersSeated, getNext)
 
-  // Get new array with the starter player first
-  const firstGroup = playersSeated.slice(starterIndex)
+// ========================================================
+// START: Redux reducer
 
-  // Get what was the start of the array (up to but not including
-  // the player who should start the next round)
-  const nextGroup = (starterIndex > 0) ? playersSeated.slice(0, starterIndex - 1) : [playersSeated[0]]
 
-  // Return a new array with all the players but in a new order.
-  // (But with the inactive players removed)
-  return [...firstGroup, ...nextGroup].filter(player => player.active)
-}
 
 /**
  *
@@ -285,3 +223,85 @@ export const roundReducer : Reducer = (
       return state
   }
 }
+
+
+
+//  END:  Redux reducer
+// ========================================================
+// START: local utilities
+
+
+
+/**
+ * Get the index of the player who should start the next
+ * round of play
+ *
+ * @param starterID ID of the player who should start this
+ *                  round
+ * @param players   List of all players in this game
+ *                  (in seating order)
+ * @param getNext   Don't return the index of the specified
+ *                  player, return the index of the next
+ *                  player in line.
+ */
+const getStarterIndex = (starterID: number, players: IPlayerPlaying[], getNext : boolean = false) : number => {
+  for (let a = 0; a < players.length; a += 1) {
+    if (players[a].id === starterID) {
+      if (getNext === true || players[a].active === false) {
+        // find the next active player
+        for (let b = a + 1; b < players.length; b += 1) {
+          if (players[a].active === true) {
+            return b
+          }
+        }
+        // No active players at the end of the list so
+        // try to find the next active player from the
+        // beginning of the list
+        for (let b = 0; b < a; b += 1) {
+          if (players[b].active === true) {
+            return b
+          }
+        }
+      } else {
+        // We found the right player! Return their index
+        return a
+      }
+    }
+  }
+  // Something weird happened.
+  // Couldn't find any valid starter.
+  return 0
+}
+
+/**
+ * Returns the players in the order they should play the next
+ * round
+ *
+ * @param playersSeated players listed in their seating order
+ *                      (based on their first round)
+ * @param starterID     id of the player who should start the
+ *                      next round
+ */
+const getPlayersInOrder = (
+  playersSeated : IPlayerPlaying[],
+  starterID : number,
+  getNext : boolean = false
+) : IPlayerPlaying[] => {
+  const starterIndex = getStarterIndex(starterID, playersSeated, getNext)
+
+  // Get new array with the starter player first
+  const firstGroup = playersSeated.slice(starterIndex)
+
+  // Get what was the start of the array (up to but not including
+  // the player who should start the next round)
+  const nextGroup = (starterIndex > 0) ? playersSeated.slice(0, starterIndex - 1) : [playersSeated[0]]
+
+  // Return a new array with all the players but in a new order.
+  // (But with the inactive players removed)
+  return [...firstGroup, ...nextGroup].filter(player => player.active)
+}
+
+
+
+//  END:  local utilities
+// ========================================================

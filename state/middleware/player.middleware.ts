@@ -1,8 +1,14 @@
 
 import { ALL_PLAYERS } from '../actions/player.action'
-import { IAction, IWholeScored, IPlayerSimple } from '../types'
+import { IAction, IWholeScored } from '../types'
 import { Middleware, Store } from '../../node_modules/redux/index.d'
 import { errorTypes, ERROR_TYPES } from '../utilities/error.types'
+import { isDuplicateName, sanitiseName } from '../utilities/name.utils'
+
+
+// ========================================================
+// START: Redux reducer
+
 
 /**
  * Validate player names before adding them to the system
@@ -58,23 +64,6 @@ export const gamePlayersAllMiddleware : Middleware = (store : Store) => (next) =
   }
 }
 
-const isDuplicateName = (newName: string, players: IPlayerSimple[]) : boolean => {
-  const callbackFunc = (last : boolean, player : IPlayerSimple) : boolean => {
-    return (last === false) ? (player.name === newName) : true
-  }
-  return players.reduce(callbackFunc, false)
-}
 
-
-const sanitiseName = (_name: string) : string => {
-  // strip invalid characters
-  let _output = _name.replace(/[^\w\d&',.\- ]+/ig, ' ')
-  // strip duplicate punctuation/space characters
-  _output = _output.replace(/([ &,.\-'])$1+/g, '$1')
-  // make sure the name is no longer than 32 characters
-  if (_output.length > 32) {
-    _output = _output.substring(0, 31)
-  }
-
-  return _output
-}
+//  END:  Redux reducer
+// ========================================================

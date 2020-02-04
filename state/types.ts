@@ -8,9 +8,9 @@
 /**
  * These objects are used as Redux actions and follow the
  * [Flux Standard Action](https://www.npmjs.com/package/flux-standard-action)
- * recommendations. They are used in favour of the Redux
- * specified Action interface as this IAction interface is
- * more rigidly typed
+ * (FSA) recommendations. They are used in favour of the
+ * Redux specified Action interface as this IAction
+ * interface is more rigidly typed
  *
  * @property type the type of action (used by middleware
  *                and reducers) to work out what to do
@@ -147,7 +147,8 @@ export interface IConfigDefault {
  *                         time each player took for their
  *                         turns
  */
-export interface IConfigGame  extends IConfigDefault{
+export interface IConfigGame  extends IConfigDefault, IHasName {
+  id: number
   allowNegative: boolean,
   endMode: END_MODE,
   minScore?: number,
@@ -159,6 +160,15 @@ export interface IConfigGame  extends IConfigDefault{
 }
 
 //  END:  config (Redux) slice interfaces
+// ----------------------------------------------
+// START: error
+
+type errorType = {
+  message: string,
+  code: number
+}
+
+//  END:  error
 // ----------------------------------------------
 // START: game (Redux) slice intefaces
 
@@ -246,6 +256,15 @@ export interface IGameFinished extends IGame {
 
 
 //  END:  game (Redux) slice intefaces
+// ----------------------------------------------
+// START: hasName interface
+
+export interface IHasName {
+  id: number,
+  name: string
+}
+
+//  END:  hasName interface
 // ----------------------------------------------
 // START: meta inteface
 
@@ -348,6 +367,7 @@ export interface IPauseFailLog extends IPauseLog {
 export interface IPayload {
   action?: IAction,
   dispatched?: boolean,
+  errorType: errorType,
   id?: number,
   isPaused?: boolean
   message?: string,
@@ -377,8 +397,8 @@ export interface IPayload {
  */
 export interface IPayloadError extends IPayload {
   now: number,
-  message: string,
-  code: number,
+  extraMessage: string,
+  type: errorType,
   state: object,
   action: IAction
 }
@@ -428,9 +448,10 @@ export interface IPlayerPlaying extends IPlayerSimple {
 /**
  *
  */
-export interface IPlayerSimple {
+export interface IPlayerSimple extends IHasName {
   id: number,
-  name: string
+  name: string,
+  active?: boolean
 }
 
 export type playerGameJoin = {
@@ -452,7 +473,6 @@ export type gamePlayers = {
   all: IPlayer[],
   playersSeatOrder: IPlayerPlaying[]
   finalResult?: ITurnComplete[]
-  // playerPositions: number[]
 }
 
 export type gamePlayersAll = {

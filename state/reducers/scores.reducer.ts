@@ -1,127 +1,21 @@
 import { Reducer } from '../../node_modules/redux/index'
 import { IAction, IGetTurns, ITurnComplete, SCORE_SORT_METHOD, TURN_SORT_FIELDS, FILTER_BY_PROP } from '../types'
-import { pureSort, ICompare } from '../utilities/functional-sort'
+import { SCORE } from '../actions/score.action'
 
-export const SCORE = {
-  ADD: 'Add score',
-  UPDATE: 'Update past score'
-}
 
-/**
- * Generate a callback function that can be passed to Array.reduce()
- *
- * @param id ID of the player whose scores we want to sum
- */
-const getTotalScoreReducer  = (id : number) => (oldTotal:number, turn:ITurnComplete) => {
-  if (turn.playerID === id) {
-    return oldTotal + turn.score.round
-  } else {
-    return oldTotal
-  }
-}
+// ========================================================
+// START: Redux reducer
 
-/**
- * get a callback function that can be passed to Array.sort()
- *
- * @param whichScore which score should the sort be based on
- */
-const sortTurnByScore = (
-  whichScore : SCORE_SORT_METHOD = SCORE_SORT_METHOD.round
-) : ICompare => (
-  turnA : ITurnComplete,
-  turnB: ITurnComplete
-) : number => {
-  return turnB.score[whichScore] - turnA.score[whichScore]
-}
-
-const sortTurnByOther = (
-  field : TURN_SORT_FIELDS = TURN_SORT_FIELDS.playOrder
-) : ICompare => (
-  turnA : ITurnComplete,
-  turnB: ITurnComplete
-) : number => {
-  return turnA[field] - turnB[field]
-}
-
-/**
- * get a callback function that can be passed to Array.filter()
- *
- * @param whichType which type of score (ITurn) should be returned
- * @param id        row or player UID to filter by
- */
-export const filterByType = (whichType : FILTER_BY_PROP, id: number) => (item: ITurnComplete) : boolean => {
-  return (item[whichType] === id)
-}
-
-export const sortTurns = (
-  turns: ITurnComplete[],
-  sortedBy : SCORE_SORT_METHOD = SCORE_SORT_METHOD.order
-) => {
-  switch (sortedBy) {
-    case SCORE_SORT_METHOD.round:
-    case SCORE_SORT_METHOD.total:
-      return pureSort(turns, sortTurnByScore(sortedBy))
-
-    case SCORE_SORT_METHOD.order:
-      return pureSort(turns, sortTurnByOther())
-
-    default:
-      return turns
-  }
-}
 
 
 /**
- * Get all the turns for a player round.
+ * score handles adding to the log of scores for each
+ * players turn in the order that each turn occurs
  *
- * @param allScores all the scores (ITurns) recored so far
- * @param id        UID of the round to be retrieved
- * @param sortedBy  the order in which to retrieve the turns
+ * @param state  (slice of redux state) array of completed
+ *               turn objects
+ * @param action FSA compliant Redux action
  */
-export const getPlayerTurns : IGetTurns = (
-  allScores: ITurnComplete[],
-  id: number,
-  sortedBy : SCORE_SORT_METHOD = SCORE_SORT_METHOD.order
-) : ITurnComplete[] => {
-  return sortTurns(
-    allScores.filter(
-      filterByType(FILTER_BY_PROP.playerID, id)
-    ),
-    sortedBy
-  )
-}
-
-/**
- * Get all the turns for a given round.
- *
- * @param allScores all the scores (ITurns) recored so far
- * @param id        UID of the round to be retrieved
- * @param sortedBy  the order in which to retrieve the turns
- */
-export const getRoundTurns : IGetTurns = (
-  allScores: ITurnComplete[],
-  id: number,
-  sortedBy : SCORE_SORT_METHOD = SCORE_SORT_METHOD.order
-) : ITurnComplete[] => {
-  return sortTurns(
-    allScores.filter(
-      filterByType(FILTER_BY_PROP.id, id)
-    ),
-    sortedBy
-  )
-}
-
-/**
- * Get the cumulative score for a given player
- *
- * @param playerID ID for the player we want the score total for
- * @param allScores All the scores from all the player
- */
-export const getTotalScore = (allScores: ITurnComplete[], playerID : number) => {
-  return allScores.reduce(getTotalScoreReducer(playerID), 0)
-}
-
-
 export const scoresReducer : Reducer = (state : ITurnComplete[] = [], action: IAction) => {
   switch (action.type) {
     case SCORE.ADD:
@@ -147,3 +41,8 @@ export const scoresReducer : Reducer = (state : ITurnComplete[] = [], action: IA
       return state
   }
 }
+
+
+
+//  END:  Redux reducer
+// ========================================================
