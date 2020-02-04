@@ -23,7 +23,7 @@ export const pauseResumeMiddleware : Middleware = (store: Store) => (next) => (a
   switch (action.type) {
     case GAME.RESUME:
       if (game.pause.start !== null && game.pause.isPaused === true) {
-        const seconds = Math.round((action.payload.now - game.pause.start) / 1000)
+        const seconds = Math.round((action.meta.now - game.pause.start) / 1000)
         newAction = {
           ...action,
           payload: {
@@ -42,11 +42,12 @@ export const pauseResumeMiddleware : Middleware = (store: Store) => (next) => (a
         newAction = {
           type: GAME.PLAY_PAUSE_FAILURE,
           payload: {
-            now: action.payload.now,
             action: action,
             message: 'Resume failed because game was not paused',
             state: game.pause
-          }
+          },
+          error: true,
+          meta: action.meta
         }
       }
       return next(newAction)
@@ -57,12 +58,17 @@ export const pauseResumeMiddleware : Middleware = (store: Store) => (next) => (a
         newAction = {
           type: GAME.PLAY_PAUSE_FAILURE,
           payload: {
-            now: action.payload.now,
             action: action,
             message: 'Pause failed because game was already paused',
             state: game.pause
-          }
+          },
+          error: true,
+          meta: action.meta
         }
+
+        // no need to trigger an aditional action because
+        // GAME.PAUSE actions already have all the info
+        // they need for the TURN reducer to process them
         return next(newAction)
       }
   }

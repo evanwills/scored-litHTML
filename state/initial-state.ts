@@ -1,9 +1,10 @@
-import { IWholeScored, END_MODE, PLAY_ORDER } from './types'
+import { playerGameJoin, IWholeScored, END_MODE, PLAY_ORDER } from './types'
 
 export const initialState : IWholeScored = {
   allPlayers: {
     index: 0,
-    players: []
+    players: [],
+    playerGames: []
   },
   currentGame: null,
   defaultConfig: {
@@ -12,7 +13,12 @@ export const initialState : IWholeScored = {
     minScore: 0,
     maxScore: 0,
     playOrder: PLAY_ORDER.SEATING_POSTION,
+    scoreBonuses: false,
     trackTime: true
   },
-  pastGames: []
+  pastGames: {
+    index: 0,
+    games: [],
+    playerGames: []
+  }
 }

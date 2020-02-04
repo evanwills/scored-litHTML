@@ -1,5 +1,5 @@
 import { Reducer } from '../../node_modules/redux/index'
-import { IAction, IGetTurns, ITurnComplete, SCORE_SORT_METHOD, FILTER_BY_PROP } from '../types'
+import { IAction, IGetTurns, ITurnComplete, SCORE_SORT_METHOD, TURN_SORT_FIELDS, FILTER_BY_PROP } from '../types'
 import { pureSort, ICompare } from '../utilities/functional-sort'
 
 export const SCORE = {
@@ -25,19 +25,22 @@ const getTotalScoreReducer  = (id : number) => (oldTotal:number, turn:ITurnCompl
  *
  * @param whichScore which score should the sort be based on
  */
-const sortByScore = (
+const sortTurnByScore = (
   whichScore : SCORE_SORT_METHOD = SCORE_SORT_METHOD.round
 ) : ICompare => (
   turnA : ITurnComplete,
   turnB: ITurnComplete
 ) : number => {
-  if (turnA.score[whichScore] < turnB.score[whichScore]) {
-    return -1
-  } else if (turnA.score[whichScore] > turnB.score[whichScore]) {
-    return 1
-  } else {
-    return 0
-  }
+  return turnB.score[whichScore] - turnA.score[whichScore]
+}
+
+const sortTurnByOther = (
+  field : TURN_SORT_FIELDS = TURN_SORT_FIELDS.playOrder
+) : ICompare => (
+  turnA : ITurnComplete,
+  turnB: ITurnComplete
+) : number => {
+  return turnA[field] - turnB[field]
 }
 
 /**
@@ -46,21 +49,24 @@ const sortByScore = (
  * @param whichType which type of score (ITurn) should be returned
  * @param id        row or player UID to filter by
  */
-const filterByType = (whichType : FILTER_BY_PROP, id: number) => (item: ITurnComplete) : boolean => {
+export const filterByType = (whichType : FILTER_BY_PROP, id: number) => (item: ITurnComplete) : boolean => {
   return (item[whichType] === id)
 }
 
-const sortTurns = (
-  filteredTurns: ITurnComplete[],
+export const sortTurns = (
+  turns: ITurnComplete[],
   sortedBy : SCORE_SORT_METHOD = SCORE_SORT_METHOD.order
 ) => {
   switch (sortedBy) {
     case SCORE_SORT_METHOD.round:
     case SCORE_SORT_METHOD.total:
-      return pureSort(filteredTurns, sortByScore(sortedBy))
+      return pureSort(turns, sortTurnByScore(sortedBy))
+
+    case SCORE_SORT_METHOD.order:
+      return pureSort(turns, sortTurnByOther())
 
     default:
-      return filteredTurns
+      return turns
   }
 }
 

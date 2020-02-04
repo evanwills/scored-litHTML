@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware } from '../../node_modules/redux/es/redux'
 import scoredReducers from './reducers/index.reducer'
-import { addNowToPayloadMiddleware } from './middleware/add-now-to-action.middleware'
+import { addNowToMetaMiddleware } from './middleware/add-now-to-action.middleware'
 import { pauseResumeMiddleware } from './middleware/pause-resume.middleware'
 import { roundMiddleWare } from './middleware/round.middleware'
 // import { initialState } from './initial-state'
@@ -8,7 +8,7 @@ import { roundMiddleWare } from './middleware/round.middleware'
 const store = createStore(
   scoredReducers,
   applyMiddleware(
-    addNowToPayloadMiddleware,
+    addNowToMetaMiddleware,
     pauseResumeMiddleware,
     roundMiddleWare
   )

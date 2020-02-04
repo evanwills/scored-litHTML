@@ -5,46 +5,156 @@
 // ----------------------------------------------
 // START: action interfaces
 
+/**
+ * These objects are used as Redux actions and follow the
+ * [Flux Standard Action](https://www.npmjs.com/package/flux-standard-action)
+ * recommendations. They are used in favour of the Redux
+ * specified Action interface as this IAction interface is
+ * more rigidly typed
+ *
+ * @property type the type of action (used by middleware
+ *                and reducers) to work out what to do
+ * @property payload information used by reducers to do
+ *                   their job
+ * @property error   [optional] whether or not this action
+ * @property meta    extra metadat useful for the action
+ *                   (mostly used by middleware to not
+ *                    apply duplicate data and functionality
+ *                    to actions that have already been
+ *                    passed throught the middle ware)
+ */
 export interface IAction {
   type: string,
   payload: IPayload,
   error?: boolean,
-  meta?: {
-    dispatched?: boolean
-  }
+  meta?: IMeta
 }
 
-export interface IActionError extends IAction {
+/**
+ * These objects requre the error property to present
+ * (and true)
+ *
+ * @property type the type of action (used by middleware
+ *                and reducers) to work out what to do
+ * @property payload information used by reducers to do
+ *                   their job
+ * @property error   [required] whether or not this action
+ * @property meta    extra metadat useful for the action
+ *                   (mostly used by middleware to not
+ *                    apply duplicate data and functionality
+ *                    to actions that have already been
+ *                    passed throught the middle ware)
+ */
+export interface IActionError extends IActionStamped {
   type: string,
-  payload: IPayloadError
+  payload: IPayloadError,
+  error: boolean,
+  meta: IMeta
 }
 
+/**
+ * These objects force the IMeta object to be requred by
+ * the action object
+ *
+ * @property type the type of action (used by middleware
+ *                and reducers) to work out what to do
+ * @property payload information used by reducers to do
+ *                   their job
+ * @property error   [optional] whether or not this action
+ * @property meta    extra metadat useful for the action
+ *                   (mostly used by middleware to not
+ *                    apply duplicate data and functionality
+ *                    to actions that have already been
+ *                    passed throught the middle ware)
+ */
 export interface IActionStamped extends IAction {
   type: string,
-  payload: IPayloadStamped
+  payload: IPayload,
+  error?: boolean,
+  meta: IMeta
 }
 
-//  END: action interfaces
+//  END:  action interfaces
 // ----------------------------------------------
 // START: config (Redux) slice interface
 
+/**
+ * These objects provide settings that modify certain parts
+ * of the apps behavior during a game
+ *
+ * @property allowNegative whether or not scores can have a
+ *                         negative value
+ * @property endMode       What happens at the end of a game
+ * @property minScore      Some games (like Five Hundred)
+ *                         end when a player reaches 500 or
+ *                         -500 this stores the minimum end
+ *                         score so if any player reaches
+ *                         the minimum score specified here,
+ *                         game is automatically ended
+ * @property maxScore      As with minScore this stores the
+ *                         maximum end score so if any
+ *                         player reaches the maximum score
+ *                         specified here, game is
+ *                         automatically ended
+ * @property playOrder     the order in which players take
+ *                         their turn for each round of the
+ *                         game
+ * @property scoreBonuses  When game finishes add additional
+ *                         bonus scores as a final round
+ * @property trackTime     Whether or not to show the "Pause"
+ *                         button while the game is active
+ *                         and show statistics about the
+ *                         time each player took for their
+ *                         turns
+ */
 export interface IConfigDefault {
   allowNegative: boolean,
   endMode: END_MODE,
   minScore?: number,
   maxScore?: number,
-  name?: string,
   playOrder: PLAY_ORDER,
+  scoreBonuses: boolean,
   trackTime: boolean
 }
 
-export interface IConfigGame {
+/**
+ * This object stores default settings for the app to make
+ * configuring a new game much quicker
+ *
+ * @property allowNegative whether or not scores can have a
+ *                         negative value
+ * @property endMode       What happens at the end of a game
+ * @property minScore      Some games (like Five Hundred)
+ *                         end when a player reaches 500 or
+ *                         -500 this stores the minimum end
+ *                         score so if any player reaches
+ *                         the minimum score specified here,
+ *                         game is automatically ended
+ * @property maxScore      As with minScore this stores the
+ *                         maximum end score so if any
+ *                         player reaches the maximum score
+ *                         specified here, game is
+ *                         automatically ended
+ * @property name The      name of the game
+ * @property playOrder     the order in which players take
+ *                         their turn for each round of the
+ *                         game
+ * @property scoreBonuses  When game finishes add additional
+ *                         bonus scores as a final round
+ * @property trackTime     Whether or not to show the "Pause"
+ *                         button while the game is active
+ *                         and show statistics about the
+ *                         time each player took for their
+ *                         turns
+ */
+export interface IConfigGame  extends IConfigDefault{
   allowNegative: boolean,
   endMode: END_MODE,
   minScore?: number,
   maxScore?: number,
   name: string,
   playOrder: PLAY_ORDER,
+  scoreBonuses: boolean,
   trackTime: boolean
 }
 
@@ -72,7 +182,7 @@ export interface IGame {
   end: number,
   config: IConfigGame,
   pause: IPause,
-  players: IPlayers,
+  players: gamePlayers,
   results?: IPlayerResult[],
   round?: IRound,
   scores: ITurnComplete[],
@@ -84,24 +194,51 @@ export interface IGame {
  * property to store info about the round currently being
  * played
  *
- * @property round all the info needed to manage the current
- *                 round of play
+ * @property end     Timestamp for when the game ended
+ * @property config  configuration information for the game
+ * @property pause   information about the "pause" state of
+ *                   the game
+ * @property players information about the players playing
+ *                   the current game
+ * @property round   all the info needed to manage the
+ *                   current round of play
+ * @property scores  list of all the Turns taken so far in
+ *                   the game in order of play
+ * @property start   Timestamp for when the game started
  */
-export interface IGameActive {
+export interface IGameActive extends IGame {
   end: number,
   config: IConfigGame,
   pause: IPause,
-  players: IPlayers,
+  players: gamePlayers,
   round: IRound,
   scores: ITurnComplete[],
   start: number,
 }
 
-export interface IGameFinished {
+/**
+ * A finished games doesn't have rounds but it does have a
+ * results where statistics about the game can be stored
+ *
+ * @property end     Timestamp for when the game ended
+ * @property config  Configuration information for the game
+ * @property pause   Information about the "pause" state of
+ *                   the game
+ * @property players Information about the players playing
+ *                   the current game
+ * @property results All the info needed to record the
+ *                   outcome of the game
+ * @property round   Information about the current round of
+ *                   turns being played
+ * @property scores  List of all the Turns taken so far in
+ *                   the game in order of play
+ * @property start   Timestamp for when the game started
+ */
+export interface IGameFinished extends IGame {
   end: number,
   config: IConfigGame,
   pause: IPause,
-  players: IPlayers,
+  players: gamePlayers,
   results: IPlayerResult[],
   scores: ITurnComplete[],
   start: number
@@ -109,6 +246,36 @@ export interface IGameFinished {
 
 
 //  END:  game (Redux) slice intefaces
+// ----------------------------------------------
+// START: meta inteface
+
+/**
+ * Meta object are used by IAction objects to store the
+ * timestamp of when the action first hits the Redux store
+ *
+ * @property dispatched whether or not this action has
+ *                      already passed through some
+ *                      middleware
+ * @property now        The timestamp for when the action
+ *                      first hit Redux store
+ */
+export interface IMeta {
+  dispatched?: boolean,
+  now: number // Timestamp
+}
+
+
+//  END:  meta intefaces
+// ----------------------------------------------
+// START: pastGames intefaces
+
+export type pastGames = {
+  index: 0,
+  games: IGameFinished[],
+  playerGames: playerGameJoin[]
+}
+
+//  END:  pastGames intefaces
 // ----------------------------------------------
 // START: pause intefaces
 
@@ -126,7 +293,7 @@ export interface IGameFinished {
  *                          game has been paused so far
  * @property log            list of all pause events so far
  */
-export interface IPause {
+export type IPause = {
   start: number,
   end: number,
   isPaused: boolean,
@@ -182,14 +349,13 @@ export interface IPayload {
   action?: IAction,
   dispatched?: boolean,
   id?: number,
-  isPaused?: boolean,
-  now?: number,
+  isPaused?: boolean
   message?: string,
   name?: string,
-  pausedSeconds?: number,
+  pauseDuration?: number,
   position?: number
   playOrder?: PLAY_ORDER,
-  playersSeated?: IPlayerSimple[]
+  playersSeated?: IPlayerPlaying[]
   score?: number,
   state?: object,
   totalScore?: number,
@@ -209,23 +375,12 @@ export interface IPayload {
  * @property action  the original action that was trying to
  *                   effect the state
  */
-export interface IPayloadError extends IPayloadStamped {
+export interface IPayloadError extends IPayload {
   now: number,
   message: string,
   code: number,
   state: object,
   action: IAction
-}
-
-/**
- * All actions get a timestamp applied to them (by middleware)
- * before they are dispatched to the store
- *
- * @property now timestam for when the action first hits
- *               the store
- */
-export interface IPayloadStamped extends IPayload {
-  now: number
 }
 
 //  END:  payload interfaces
@@ -251,6 +406,8 @@ export interface IPayloadStamped extends IPayload {
  *                      played so far
  */
 export interface IPlayer extends IPlayerSimple {
+  id: number,
+  name: string,
   position: number,
   rank: number,
   score: number,
@@ -259,27 +416,49 @@ export interface IPlayer extends IPlayerSimple {
   turns: number,
 }
 
-export interface IPlayerSimple {
+/**
+ *
+ */
+export interface IPlayerPlaying extends IPlayerSimple {
   id: number,
   name: string,
+  active: boolean
+}
+
+/**
+ *
+ */
+export interface IPlayerSimple {
+  id: number,
+  name: string
+}
+
+export type playerGameJoin = {
+  playerID: number,
+  gameID: number,
+  seatingOrder: number,
+  rank: number
 }
 
 export interface IPlayerResult extends IPlayerSimple{
+  id: number,
+  name: string,
   score: number,
   rank: number
 }
 
-export interface IPlayers {
+export type gamePlayers = {
   index: number,
   all: IPlayer[],
-  playersSeatOrder: IPlayerSimple[]
+  playersSeatOrder: IPlayerPlaying[]
   finalResult?: ITurnComplete[]
   // playerPositions: number[]
 }
 
-export interface IPlayersAll {
+export type gamePlayersAll = {
   index: number,
   players: IPlayerSimple[]
+  playerGames: playerGameJoin[]
 }
 
 //  END:  player(s) interfaces
@@ -297,12 +476,14 @@ export interface IPlayersAll {
  * @property winnerID       UID of the winner of the round
  * @property leaderID       UID overall game leader
  */
-export interface IRound {
+export type IRound = {
+  firstPlayerID: number,
   index: number,
-  turns: IRoundTurns,
-  playersInOrder: IPlayerSimple[],
-  winnerID?: number,
   leaderID?: number
+  playersInOrder: IPlayerPlaying[],
+  playOrderIndex: number,
+  turns: IRoundTurns,
+  winnerID?: number,
 }
 
 /**
@@ -311,7 +492,7 @@ export interface IRound {
  * @property current Turn object for the current player
  * @property played  Array of completed turns
  */
-export interface IRoundTurns {
+export type IRoundTurns = {
   index: number,
   current: ITurn,
   played: ITurnComplete[]
@@ -322,15 +503,12 @@ export interface IRoundTurns {
 
 export interface ITurn {
   id: number,
+  end?: number,
+  pauseDuration: number
   playerID: number,
   playOrder: number,
-  start: number,
-  pauseDuration: number
-  end?: number,
-  score: {
-    round: number,
-    total?: number
-  }
+  score: ITurnScore,
+  start: number
 }
 
 /**
@@ -339,22 +517,22 @@ export interface ITurn {
  */
 export interface ITurnComplete extends ITurn {
   id: number,
-  roundIndex: number,
+  end: number,
+  pauseDuration: number,
   playerID: number,
   playOrder: number,
-  start: number,
-  end: number,
+  rank: ITurnRank,
+  roundIndex: number,
   score: ITurnScore,
-  pauseDuration: number,
-  rank: ITurnRank
+  start: number
 }
 
-export interface ITurnScore {
+export type ITurnScore = {
   round: number,
   total?: number
 }
 
-export interface ITurnRank {
+export type ITurnRank = {
   round: number,
   overall: number
 }
@@ -363,11 +541,11 @@ export interface ITurnRank {
 // ----------------------------------------------
 
 
-export interface IWholeScored {
-  allPlayers: IPlayersAll,
+export type IWholeScored = {
+  allPlayers: gamePlayersAll,
   defaultConfig: IConfigDefault
   currentGame: IGameActive,
-  pastGames: IGameFinished[],
+  pastGames: pastGames,
 }
 
 
@@ -376,7 +554,7 @@ export interface IWholeScored {
 // START: unions declarations
 
 export type SliceTypes = IConfigDefault | IConfigGame | IGame |
-                         IGame[] | IPause | IPlayers | IPlayersAll |
+                         IGame[] | IPause | gamePlayers | gamePlayersAll |
                          IRound | IRoundTurns | ITurnComplete[] |
                          ITurnRank | ITurnScore | number
 
@@ -397,7 +575,7 @@ export interface IGetTurns {
   ) : ITurnComplete[]
 }
 
-export interface Reducer {
+export interface IReducer {
   (state : SliceTypes, action : IAction) : SliceTypes
 }
 
@@ -446,4 +624,14 @@ export enum FILTER_BY_PROP {
 export enum PAUSE_LOG_TYPE {
   PAUSE,
   RESUME
+}
+
+export enum TURN_SORT_FIELDS {
+  id,
+  end,
+  pauseDuration,
+  playerID,
+  playOrder,
+  roundIndex,
+  start
 }

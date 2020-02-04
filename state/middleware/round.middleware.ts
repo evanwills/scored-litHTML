@@ -1,5 +1,5 @@
-import { TURN, endTurnActionCreator, startTurnActionCreator } from '../actions/turns.action'
-import { ROUND, initialiseRoundActionCreator, finaliseRoundActionCreator } from '../actions/round.action'
+import { TURN, endTurnAC, startTurnAC } from '../actions/turns.action'
+import { ROUND, initialiseRoundAC, finaliseRoundAC } from '../actions/round.action'
 import { getTotalScore } from '../reducers/scores.reducer'
 import { IAction, IWholeScored } from '../types'
 import { Middleware, Store } from '../../node_modules/redux/index'
@@ -14,7 +14,13 @@ export const roundMiddleWare : Middleware = (store : Store) => (next) => (action
       if (typeof action.meta.dispatched === 'undefined') {
         store.dispatch({
           type: action.type,
-          payload: action.payload,
+          payload: {
+            ...action.payload,
+            totalScore: getTotalScore(
+              scores,
+              round.turns.current.playerID
+            )
+          },
           error: action.error,
           meta: {
             ...action.meta,  // let myslef know I've seen this
@@ -26,16 +32,13 @@ export const roundMiddleWare : Middleware = (store : Store) => (next) => (action
         /**
          * The most up-to-date total score for the current player
          */
-        const totalScore = getTotalScore(
-          scores,
-          round.turns.current.playerID
-        )
-        store.dispatch(endTurnActionCreator(totalScore))
+        const totalScore =
+        store.dispatch(endTurnAC())
 
         if (end === null) {
-          return next(startTurnActionCreator())
+          return next(startTurnAC())
         } else {
-          return next(finaliseRoundActionCreator())
+          return next(finaliseRoundAC())
         }
       }
       break
@@ -44,11 +47,11 @@ export const roundMiddleWare : Middleware = (store : Store) => (next) => (action
       if (round.playersInOrder.length === 0) {
         // We've reached the end of the current round
         // Better do all the adding up for this round
-        store.dispatch(finaliseRoundActionCreator())
+        store.dispatch(finaliseRoundAC())
 
         // Better get everything ready for the next round
         store.dispatch(
-          initialiseRoundActionCreator(
+          initialiseRoundAC(
             players.playersSeatOrder,
             config.playOrder
           )

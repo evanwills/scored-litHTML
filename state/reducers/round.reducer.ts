@@ -2,33 +2,60 @@ import { Reducer } from '../../node_modules/redux/index'
 import { ROUND } from '../actions/round.action'
 import { TURN } from '../actions/turns.action'
 import { GAME } from '../actions/game.action'
-import { IAction, IRound, PLAY_ORDER, IPlayerSimple} from '../types'
+import { sortTurns } from './scores.reducer'
+import { IAction, IRound, PLAY_ORDER, IPlayerPlaying, IRoundTurns, ITurn, ITurnComplete, SCORE_SORT_METHOD } from '../types'
 
 const initialRound : IRound = {
+  firstPlayerID: null,
   index: 0,
+  playersInOrder: [],
+  playOrderIndex: 0,
   turns: {
     index: 0,
     current: null,
     played: []
-  },
-  playersInOrder: []
+  }
 }
 
 /**
- * Returns a reducer callback function with the ID of the player who
- * should go first in the next round curried into the callback
- * function.
+ * Get the index of the player who should start the next
+ * round of play
  *
- * Returned function is to be passed to Array.reduce()
- *
- * @param starterID
+ * @param starterID ID of the player who should start this
+ *                  round
+ * @param players   List of all players in this game
+ *                  (in seating order)
+ * @param getNext   Don't return the index of the specified
+ *                  player, return the index of the next
+ *                  player in line.
  */
-const getStarterIndexReducer = (starterID: number) => (currentI: number, player : IPlayerSimple , newI: number) => {
-  if (player.id === starterID) {
-    return newI
-  } else {
-    return currentI
+const getStarterIndex = (starterID: number, players: IPlayerPlaying[], getNext : boolean = false) : number => {
+  for (let a = 0; a < players.length; a += 1) {
+    if (players[a].id === starterID) {
+      if (getNext === true || players[a].active === false) {
+        // find the next active player
+        for (let b = a + 1; b < players.length; b += 1) {
+          if (players[a].active === true) {
+            return b
+          }
+        }
+        // No active players at the end of the list so
+        // try to find the next active player from the
+        // beginning of the list
+        for (let b = 0; b < a; b += 1) {
+          if (players[b].active === true) {
+            return b
+          }
+        }
+      } else {
+        // We found the right player! Return their index
+        return a
+      }
+    }
   }
+  // Something weird happened.
+  // Couldn't find any valid starter.
+  return 0
 }
 
 /**
@@ -41,29 +68,22 @@ const getStarterIndexReducer = (starterID: number) => (currentI: number, player 
  *                      next round
  */
 const getPlayersInOrder = (
-  playersSeated : IPlayerSimple[],
-  starterID : number
-) : IPlayerSimple[] => {
-  if (playersSeated[0].id === starterID) {
-    // The player who started last round should start the next
-    // round as well
-    return playersSeated
-  } else {
-    const starterIndex = playersSeated.reduce(
-      getStarterIndexReducer(starterID),
-      0
-    )
+  playersSeated : IPlayerPlaying[],
+  starterID : number,
+  getNext : boolean = false
+) : IPlayerPlaying[] => {
+  const starterIndex = getStarterIndex(starterID, playersSeated, getNext)
 
-    // Get new array with the starter player first
-    const firstGroup = playersSeated.slice(starterIndex)
+  // Get new array with the starter player first
+  const firstGroup = playersSeated.slice(starterIndex)
 
-    // Get what was the start of the array (up to but not including
-    // the player who should start the next round)
-    const nextGroup = playersSeated.slice(0, starterIndex - 1)
+  // Get what was the start of the array (up to but not including
+  // the player who should start the next round)
+  const nextGroup = (starterIndex > 0) ? playersSeated.slice(0, starterIndex - 1) : [playersSeated[0]]
 
-    // Return a new array with all the players but in a new order.
-    return [...firstGroup, ...nextGroup]
-  }
+  // Return a new array with all the players but in a new order.
+  // (But with the inactive players removed)
+  return [...firstGroup, ...nextGroup].filter(player => player.active)
 }
 
 /**
@@ -81,7 +101,10 @@ export const roundReducer : Reducer = (
   const {type, payload} = action
   switch (type) {
     case ROUND.INITIALISE:
-      let playersInOrder : IPlayerSimple[] = null;
+      // --------------------------------------------------
+      // START: initialisation
+
+      let playersInOrder : IPlayerPlaying[] = null;
 
       switch (payload.playOrder) {
         case PLAY_ORDER.ROUND_WINNER:
@@ -105,40 +128,158 @@ export const roundReducer : Reducer = (
         case PLAY_ORDER.NEXT:
           playersInOrder = getPlayersInOrder(
             payload.playersSeated,
-            payload.playersSeated[1].id
+            state.firstPlayerID,
+            true
           )
           break;
 
         case PLAY_ORDER.SEATING_POSTION:
         default:
-          playersInOrder = payload.playersSeated
+          playersInOrder = payload.playersSeated.filter(player => player.active)
           break;
       }
 
       return {
         ...initialRound,
         index: state.index += 1,
-        playersInOrder: playersInOrder
+        playersInOrder: playersInOrder,
+        // record the ID of the first player
+        firstPlayerID: playersInOrder[0].id
       }
 
-    case ROUND.ADD_TURN:
-      break
-    case ROUND.UPDATE_TURN:
-      break
+      //  END:  initialisation
+      // --------------------------------------------------
+
     case ROUND.FINALISE:
-      break
+      // --------------------------------------------------
+      // START: finalisation
+
+      // get round rankings
+      const _roundRank = sortTurns(state.turns.played, SCORE_SORT_METHOD.round)
+      const _roundWinner = _roundRank[0].playerID
+
+      // get current overall game rankings
+      const _totalRank = sortTurns(_roundRank.map((turn: ITurnComplete, index : number) => {
+        return {
+          ...turn,
+          rank: {
+            ...turn.rank,
+            round: index + 1
+          }
+        }
+      }), SCORE_SORT_METHOD.total)
+      const _gameLeader = _totalRank[0].playerID
+      const _rankedturns = sortTurns(_totalRank.map((turn : ITurnComplete, index: number) => {
+        return {
+          ...turn,
+          rank: {
+            ...turn.rank,
+            total: index + 1
+          }
+        }
+      }), SCORE_SORT_METHOD.round)
+
+      return {
+        ...state,
+        turns: {
+          ...state.turns,
+          played: _rankedturns
+        },
+        winnerID: _roundWinner,
+        leaderID: _gameLeader
+      }
+
+      // END: finalisation
+      // --------------------------------------------------
+
     case TURN.START:
+      const _turnIndex = state.turns.index + 1
+      const _playIndex = state.playOrderIndex + 1
+      const _current : ITurn = {
+        id: _turnIndex,
+        end: null,
+        pauseDuration: 0,
+        playerID: state.playersInOrder[0].id,
+        playOrder: _playIndex,
+        score: {
+          round: 0,
+          total: null
+        },
+        start: action.meta.now
+      }
+      return {
+        ...state,
+        turns: {
+          ...state.turns,
+          index: _turnIndex,
+          current: _current,
+        }
+      }
       break
+
     case TURN.SCORE:
+      return {
+        ...state,
+        turns: {
+          ...state.turns,
+          current: {
+            ...state.turns.current,
+            score: {
+              round: payload.score,
+              total: payload.totalScore + payload.score
+            }
+          }
+        }
+      }
       break
-    case TURN.PAUSE:
-      break
-    case TURN.RESUME:
-      break
+
+    case GAME.RESUME:
+      return {
+        ...state,
+        turns: {
+          ...state.turns,
+          current: {
+            ...state.turns.current,
+            pauseDuration: state.turns.current.pauseDuration + payload.pauseDuration
+          }
+        }
+      }
+
     case TURN.END:
-      break
+      // Create a complted turn
+      const completedTurn : ITurnComplete = {
+        ...state.turns.current,
+        end: action.meta.now,
+        rank: null,
+        roundIndex: state.index
+      }
+      const _turns : IRoundTurns = {
+        index: state.turns.index,
+        current: null,
+        played: [...state.turns.played, completedTurn]
+      }
+
+      return {
+        ...state,
+        turns: _turns,
+        // remove the current player from the list of
+        // players yet to have their turn
+        playersInOrder: state.playersInOrder.filter(
+          player => (player.id !== completedTurn.playerID)
+        )
+      }
+
     case GAME.INITIALISE:
-      return initialRound
+      // It is assumed that all players listed for the game
+      // will play the first round
+
+      return {
+        ...initialRound,
+        index: 1,
+        playersInOrder: payload.playersSeated,
+        // record the ID of the first player
+        firstPlayerID: payload.playersSeated[0].id
+      }
 
     default:
       return state

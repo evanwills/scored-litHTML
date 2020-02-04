@@ -1,5 +1,5 @@
 
-import { PLAY_ORDER, IPlayerSimple, IAction} from '../types'
+import { PLAY_ORDER, IPlayerPlaying, IAction} from '../types'
 
 export const ROUND = {
   INITIALISE: 'INITIALISE_ROUND',
@@ -8,7 +8,7 @@ export const ROUND = {
   FINALISE: 'FINALISE_ROUND'
 }
 
-export const initialiseRoundActionCreator = (playersSeatOrder : IPlayerSimple[], playOrder: PLAY_ORDER ) : IAction => {
+export const initialiseRoundAC = (playersSeatOrder : IPlayerPlaying[], playOrder: PLAY_ORDER ) : IAction => {
   return {
     type: ROUND.INITIALISE,
     payload: {
@@ -17,7 +17,7 @@ export const initialiseRoundActionCreator = (playersSeatOrder : IPlayerSimple[],
     }
   }
 }
-export const finaliseRoundActionCreator = () => {
+export const finaliseRoundAC = () => {
   return {
     type: ROUND.FINALISE,
     payload: {}

@@ -15,7 +15,7 @@ export const pauseReducer : Reducer = (state : IPause = initialPause, action : I
   switch (action.type) {
     case GAME.PAUSE:
       return {
-        start: action.payload.now,
+        start: action.meta.now,
         end: null,
         isPaused: true,
         log: [
@@ -23,7 +23,7 @@ export const pauseReducer : Reducer = (state : IPause = initialPause, action : I
           {
             error: false,
             mode: PAUSE_LOG_TYPE.PAUSE,
-            time: action.payload.now
+            time: action.meta.now
           }
         ],
         pauses: state.pauses,
@@ -66,7 +66,7 @@ export const pauseReducer : Reducer = (state : IPause = initialPause, action : I
           ...state.log,
           {
             error: true,
-            time: action.payload.now,
+            time: action.meta.now,
             message: action.payload.message,
             mode: (action.payload.isPaused) ? PAUSE_LOG_TYPE.PAUSE : PAUSE_LOG_TYPE.RESUME
           }

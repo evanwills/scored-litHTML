@@ -2,9 +2,9 @@ import { IAction } from "../types"
 
 export const PLAYER = {
   ADD: 'Add player to game',
-  UPDATE: 'Update game player',
-  SCORE_TURN: 'Score turn',
-  DELETE: 'Remove player form game'
+  UPDATE: 'Update game player\'s name',
+  REARRANGE: 'Change the seating order of players',
+  DEACTIVATE: 'Stop player from having turns'
 }
 
 export const ALL_PLAYERS = {
@@ -13,7 +13,7 @@ export const ALL_PLAYERS = {
   DELETE: 'Remove player from list'
 }
 
-export const addPlayerToGameActionCreator = (_name, _position) : IAction => {
+export const addPlayerToGameAC = (_name, _position) : IAction => {
   return {
     type: PLAYER.ADD,
     payload: {
@@ -23,7 +23,7 @@ export const addPlayerToGameActionCreator = (_name, _position) : IAction => {
   }
 }
 
-export const updatePlayerActionCreator = (_id, _name, _position) : IAction => {
+export const updatePlayerAC = (_id, _name, _position) : IAction => {
   return {
     type: PLAYER.UPDATE,
     payload: {
@@ -35,31 +35,12 @@ export const updatePlayerActionCreator = (_id, _name, _position) : IAction => {
 }
 
 /**
- * Create an action object for scoring a turn
- *
- * @param {number} _id
- * @param {number} _score
- * @param {Date} _endTime
- * @param {number} _pausedTime
- *
- * @returns {object}
- */
-export const scoreTurnActionCreator = (_score : number) : IAction => {
-  return {
-    type: PLAYER.SCORE_TURN,
-    payload: {
-      score: _score
-    }
-  }
-}
-
-/**
  * Add a new player to the system.
  * (This is not the same as adding a player to a game)
  *
  * @param _name name of the player being added to the system
  */
-export const addNewPlayerActionCreator = (_name : string) => {
+export const addNewPlayerAC = (_name : string) => {
   return {
     type: ALL_PLAYERS.ADD,
     payload: {
@@ -74,7 +55,7 @@ export const addNewPlayerActionCreator = (_name : string) => {
  *
  * @param _name name of the player being added to the system
  */
-export const updateExistingPlayerActionCreator = (_name : string) => {
+export const updateExistingPlayerAC = (_name : string) => {
   return {
     type: ALL_PLAYERS.UPDATE,
     payload: {
@@ -89,7 +70,7 @@ export const updateExistingPlayerActionCreator = (_name : string) => {
  *
  * @param _name name of the player being added to the system
  */
-export const deleteExistingPlayerActionCreator = (_id : number) => {
+export const dactivateExistingPlayerAC = (_id : number) => {
   return {
     type: ALL_PLAYERS.UPDATE,
     payload: {

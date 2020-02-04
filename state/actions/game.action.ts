@@ -10,7 +10,7 @@ export const GAME = {
 /**
  * Set the game to paused (i.e. stop counting the time)
  */
-export const pauseGameActionCreator = () => {
+export const pauseGameAC = () => {
   return {
     type: GAME.PAUSE,
     payload: {}
@@ -20,7 +20,7 @@ export const pauseGameActionCreator = () => {
 /**
  * Set the game to paused (i.e. stop counting the time)
  */
-export const resumeGameActionCreator = () => {
+export const resumeGameAC = () => {
   return {
     type: GAME.RESUME,
     payload: {}
@@ -30,7 +30,7 @@ export const resumeGameActionCreator = () => {
 /**
  * Set the game to paused (i.e. stop counting the time)
  */
-export const endGameActionCreator = () => {
+export const endGameAC = () => {
   return {
     type: GAME.END,
     payload: {}
@@ -45,7 +45,7 @@ export const endGameActionCreator = () => {
  * @param {string}  _endMode   How the game ends
  * @param {string}  _playOrder Play order for the start of each round.
  */
-export const initialiseGameActionCreator = (_name, _clockwise, _endMode, _playOrder) => {
+export const initialiseGameAC = (_name, _clockwise, _endMode, _playOrder) => {
   return {
     type: GAME.INITIALISE,
     payload: {
@@ -61,7 +61,7 @@ export const initialiseGameActionCreator = (_name, _clockwise, _endMode, _playOr
  *
  * @param {string}  _firstPlayer First player to take a turn
  */
-export const startGameActionCreator = (_firstPlayer) => {
+export const startGameAC = (_firstPlayer) => {
   return {
     type: GAME.START,
     payload: {
