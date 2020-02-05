@@ -1,6 +1,6 @@
 import { GAME } from '../actions/game.action'
 import { TURN } from '../actions/turns.action'
-import { IActionStamped, IWholeScored, IGameActive } from '../types'
+import { IActionStamped, IWholeScored, IGameActive } from '../utilities/types'
 import { Middleware, Store } from '../../node_modules/redux/index'
 
 /**

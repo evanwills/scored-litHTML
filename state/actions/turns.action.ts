@@ -1,4 +1,4 @@
-import { IAction } from '../types'
+import { IAction } from '../utilities/types'
 
 export const TURN = {
   START: 'Start a player\'s turn',

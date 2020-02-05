@@ -1,4 +1,4 @@
-import { IAction, IWholeScored, IHasName } from '../types'
+import { IAction, IWholeScored, IHasName } from '../utilities/types'
 
 /**
  * Check whether a given name is already in use

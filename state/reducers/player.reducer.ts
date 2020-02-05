@@ -1,5 +1,5 @@
 import { Reducer } from '../../node_modules/redux/index'
-import { gamePlayers, IAction, gamePlayersAll } from '../types'
+import { gamePlayers, IAction, gamePlayersAll } from '../utilities/types'
 import { ALL_PLAYERS } from '../actions/player.action'
 
 

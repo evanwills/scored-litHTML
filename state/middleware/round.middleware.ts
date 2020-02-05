@@ -1,7 +1,7 @@
 import { TURN, endTurnAC, startTurnAC } from '../actions/turns.action'
 import { ROUND, initialiseRoundAC, finaliseRoundAC } from '../actions/round.action'
 import { getTotalScore } from '../utilities/score.utils'
-import { IAction, IWholeScored } from '../types'
+import { IAction, IWholeScored } from '../utilities/types'
 import { Middleware, Store } from '../../node_modules/redux/index'
 
 export const roundMiddleWare : Middleware = (store : Store) => (next) => (action : IAction) => {

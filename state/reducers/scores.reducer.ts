@@ -1,5 +1,5 @@
 import { Reducer } from '../../node_modules/redux/index'
-import { IAction, IGetTurns, ITurnComplete, SCORE_SORT_METHOD, TURN_SORT_FIELDS, FILTER_BY_PROP } from '../types'
+import { IAction, IGetTurns, ITurnComplete, SCORE_SORT_METHOD, TURN_SORT_FIELDS, FILTER_BY_PROP } from '../utilities/types'
 import { SCORE } from '../actions/score.action'
 
 

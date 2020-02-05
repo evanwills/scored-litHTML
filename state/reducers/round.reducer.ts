@@ -3,7 +3,7 @@ import { ROUND } from '../actions/round.action'
 import { TURN } from '../actions/turns.action'
 import { GAME } from '../actions/game.action'
 import { sortTurns } from '../utilities/score.utils'
-import { IAction, IRound, PLAY_ORDER, IPlayerPlaying, IRoundTurns, ITurn, ITurnComplete, SCORE_SORT_METHOD } from '../types'
+import { IAction, IRound, PLAY_ORDER, IPlayerPlaying, IRoundTurns, ITurn, ITurnComplete, SCORE_SORT_METHOD } from '../utilities/types'
 
 const initialRound : IRound = {
   firstPlayerID: null,

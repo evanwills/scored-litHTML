@@ -1,6 +1,6 @@
 import { Reducer } from '../../node_modules/redux/index'
 import { GAME } from '../actions/game.action'
-import { IPause, IPauseLog, IPauseFailLog, IActionStamped, PAUSE_LOG_TYPE } from '../types'
+import { IPause, IPauseLog, IPauseFailLog, IActionStamped, PAUSE_LOG_TYPE } from '../utilities/types'
 
 const initialPause : IPause = {
   start: null,

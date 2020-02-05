@@ -1,5 +1,5 @@
 
-import { PLAY_ORDER, IPlayerPlaying, IAction} from '../types'
+import { PLAY_ORDER, IPlayerPlaying, IAction} from '../utilities/types'
 
 export const ROUND = {
   INITIALISE: 'INITIALISE_ROUND',

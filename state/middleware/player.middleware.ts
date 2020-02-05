@@ -1,6 +1,6 @@
 
 import { ALL_PLAYERS } from '../actions/player.action'
-import { IAction, IWholeScored } from '../types'
+import { IAction, IWholeScored } from '../utilities/types'
 import { Middleware, Store } from '../../node_modules/redux/index.d'
 import { errorTypes, ERROR_TYPES } from '../utilities/error.types'
 import { isDuplicateName, sanitiseName } from '../utilities/name.utils'

@@ -1,5 +1,5 @@
 import { Middleware, Store } from '../../node_modules/redux/index'
-import { IAction } from '../types'
+import { IAction } from '../utilities/types'
 
 /**
  * source: https://redux.js.org/advanced/middleware/#seven-examples
