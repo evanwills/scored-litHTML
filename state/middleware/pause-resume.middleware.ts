@@ -23,12 +23,12 @@ export const pauseResumeMiddleware : Middleware = (store: Store) => (next) => (a
   switch (action.type) {
     case GAME.RESUME:
       if (game.pause.start !== null && game.pause.isPaused === true) {
-        const seconds = Math.round((action.meta.now - game.pause.start) / 1000)
+        const seconds = (action.meta.now - game.pause.start)
         newAction = {
           ...action,
           payload: {
             ...action.payload,
-            pausedSeconds: seconds
+            pauseDuration: seconds
           }
         }
         // dispatch an additional action to trigger unpausing of the

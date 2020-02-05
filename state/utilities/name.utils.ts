@@ -1,4 +1,4 @@
-import { IAction, IWholeScored, IHasName } from '../utilities/types'
+import { IAction, IWholeScored, IHasName, IPlayerSimple } from '../utilities/types'
 
 /**
  * Check whether a given name is already in use
@@ -6,10 +6,18 @@ import { IAction, IWholeScored, IHasName } from '../utilities/types'
  * @param items
  */
 export const isDuplicateName = (newName: string, items: IHasName[]) : boolean => {
-  const callbackFunc = (last : boolean, item : IHasName) : boolean => {
-    return (last === false) ? (item.name === newName) : true
+  // Q: Why use a for loop instead of Array.reduce()?
+  // A: Mostly for readability and because I can terminate
+  //    the loop as soon as I have a match.
+  //    I could also use filter but again you have to
+  //    process the whole array.
+
+  for (let a = 0; a < items.length; a += 1) {
+    if (newName === items[a].name) {
+      return true;
+    }
   }
-  return items.reduce(callbackFunc, false)
+  return false
 }
 
 /**
@@ -33,4 +41,19 @@ export const sanitiseName = (_name: string) : string => {
   }
 
   return _output
+}
+
+/**
+ * Get the object for the specified player
+ *
+ * @param _id        ID of player to be retrieved
+ * @param allPlayers list of players in the system
+ */
+export const getPlayerByID = (_id : number, allPlayers: IPlayerSimple[]) : IPlayerSimple | null => {
+  for (let a = 0; a < allPlayers.length; a += 1) {
+    if (allPlayers[a].id === _id) {
+      return allPlayers[0]
+    }
+  }
+  return null
 }

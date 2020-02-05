@@ -3,7 +3,7 @@ import { ROUND } from '../actions/round.action'
 import { TURN } from '../actions/turns.action'
 import { GAME } from '../actions/game.action'
 import { sortTurns } from '../utilities/score.utils'
-import { IAction, IRound, PLAY_ORDER, IPlayerPlaying, IRoundTurns, ITurn, ITurnComplete, SCORE_SORT_METHOD } from '../utilities/types'
+import { IAction, IRound, PLAY_ORDER, IPlayerSimple, IRoundTurns, ITurn, ITurnComplete, SCORE_SORT_METHOD } from '../utilities/types'
 
 const initialRound : IRound = {
   firstPlayerID: null,
@@ -42,12 +42,12 @@ export const roundReducer : Reducer = (
       // --------------------------------------------------
       // START: initialisation
 
-      let playersInOrder : IPlayerPlaying[] = null;
+      let playersInOrder : IPlayerSimple[] = null;
 
       switch (payload.playOrder) {
         case PLAY_ORDER.ROUND_WINNER:
           playersInOrder = getPlayersInOrder(
-            payload.playersSeated,
+            payload.players,
             state.winnerID
           )
           break;
@@ -58,14 +58,14 @@ export const roundReducer : Reducer = (
 
         case PLAY_ORDER.GAME_LEADER:
           playersInOrder = getPlayersInOrder(
-            payload.playersSeated,
+            payload.players,
             state.leaderID
           )
           break;
 
         case PLAY_ORDER.NEXT:
           playersInOrder = getPlayersInOrder(
-            payload.playersSeated,
+            payload.players,
             state.firstPlayerID,
             true
           )
@@ -73,7 +73,7 @@ export const roundReducer : Reducer = (
 
         case PLAY_ORDER.SEATING_POSTION:
         default:
-          playersInOrder = payload.playersSeated.filter(player => player.active)
+          playersInOrder = payload.players.filter(player => player.active)
           break;
       }
 
@@ -96,7 +96,10 @@ export const roundReducer : Reducer = (
       const _roundRank = sortTurns(state.turns.played, SCORE_SORT_METHOD.round)
       const _roundWinner = _roundRank[0].playerID
 
-      // get current overall game rankings
+      // update each turn, setting the round ranking based
+      // on the position in the sorted array
+      // Then sort the turns based on top score to get the
+      // current overall game rankings
       const _totalRank = sortTurns(_roundRank.map((turn: ITurnComplete, index : number) => {
         return {
           ...turn,
@@ -106,7 +109,13 @@ export const roundReducer : Reducer = (
           }
         }
       }), SCORE_SORT_METHOD.total)
+
       const _gameLeader = _totalRank[0].playerID
+
+      // Update each turn to store the player's current
+      // overall ranking for the this game
+      // Then sort the turns back into their play order so
+      // they can be stored in the scores list
       const _rankedturns = sortTurns(_totalRank.map((turn : ITurnComplete, index: number) => {
         return {
           ...turn,
@@ -123,7 +132,9 @@ export const roundReducer : Reducer = (
           ...state.turns,
           played: _rankedturns
         },
+        // record the winner for the round
         winnerID: _roundWinner,
+        // record the overall game leader
         leaderID: _gameLeader
       }
 
@@ -214,9 +225,9 @@ export const roundReducer : Reducer = (
       return {
         ...initialRound,
         index: 1,
-        playersInOrder: payload.playersSeated,
+        playersInOrder: payload.players,
         // record the ID of the first player
-        firstPlayerID: payload.playersSeated[0].id
+        firstPlayerID: payload.players[0].id
       }
 
     default:
@@ -244,7 +255,7 @@ export const roundReducer : Reducer = (
  *                  player, return the index of the next
  *                  player in line.
  */
-const getStarterIndex = (starterID: number, players: IPlayerPlaying[], getNext : boolean = false) : number => {
+const getStarterIndex = (starterID: number, players: IPlayerSimple[], getNext : boolean = false) : number => {
   for (let a = 0; a < players.length; a += 1) {
     if (players[a].id === starterID) {
       if (getNext === true || players[a].active === false) {
@@ -277,24 +288,24 @@ const getStarterIndex = (starterID: number, players: IPlayerPlaying[], getNext :
  * Returns the players in the order they should play the next
  * round
  *
- * @param playersSeated players listed in their seating order
+ * @param players players listed in their seating order
  *                      (based on their first round)
  * @param starterID     id of the player who should start the
  *                      next round
  */
 const getPlayersInOrder = (
-  playersSeated : IPlayerPlaying[],
+  players : IPlayerSimple[],
   starterID : number,
   getNext : boolean = false
-) : IPlayerPlaying[] => {
-  const starterIndex = getStarterIndex(starterID, playersSeated, getNext)
+) : IPlayerSimple[] => {
+  const starterIndex = getStarterIndex(starterID, players, getNext)
 
   // Get new array with the starter player first
-  const firstGroup = playersSeated.slice(starterIndex)
+  const firstGroup = players.slice(starterIndex)
 
   // Get what was the start of the array (up to but not including
   // the player who should start the next round)
-  const nextGroup = (starterIndex > 0) ? playersSeated.slice(0, starterIndex - 1) : [playersSeated[0]]
+  const nextGroup = (starterIndex > 0) ? players.slice(0, starterIndex - 1) : [players[0]]
 
   // Return a new array with all the players but in a new order.
   // (But with the inactive players removed)

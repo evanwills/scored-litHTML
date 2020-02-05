@@ -1,4 +1,5 @@
-// ========================================================
+
+import { E_TYPE } from "./error.types";// ========================================================
 // START: interface declarations
 
 
@@ -163,9 +164,11 @@ export interface IConfigGame  extends IConfigDefault, IHasName {
 // ----------------------------------------------
 // START: error
 
-type errorType = {
+export type ErrorType = {
+  name: string,
   message: string,
-  code: number
+  code: number,
+  replacementCount: number
 }
 
 //  END:  error
@@ -279,6 +282,7 @@ export interface IHasName {
  *                      first hit Redux store
  */
 export interface IMeta {
+  code?: number,
   dispatched?: boolean,
   now: number // Timestamp
 }
@@ -286,15 +290,15 @@ export interface IMeta {
 
 //  END:  meta intefaces
 // ----------------------------------------------
-// START: pastGames intefaces
+// START: PastGames intefaces
 
-export type pastGames = {
+export type PastGames = {
   index: 0,
   games: IGameFinished[],
   playerGames: playerGameJoin[]
 }
 
-//  END:  pastGames intefaces
+//  END:  PastGames intefaces
 // ----------------------------------------------
 // START: pause intefaces
 
@@ -367,15 +371,16 @@ export interface IPauseFailLog extends IPauseLog {
 export interface IPayload {
   action?: IAction,
   dispatched?: boolean,
-  errorType?: errorType,
+  ErrorType?: ErrorType,
   id?: number,
   isPaused?: boolean
   message?: string,
   name?: string,
   pauseDuration?: number,
-  position?: number
+  player?: IPlayerSimple,
+  players?: IPlayerSimple[],
   playOrder?: PLAY_ORDER,
-  playersSeated?: IPlayerPlaying[]
+  position?: number,
   score?: number,
   state?: StateSlice,
   totalScore?: number,
@@ -396,11 +401,11 @@ export interface IPayload {
  *                   effect the state
  */
 export interface IPayloadError extends IPayload {
-  now: number,
-  extraMessage: string,
-  type: errorType,
-  state: StateSlice,
-  action: IAction
+  action: IAction,
+  code: number,
+  message: string,
+  state?: StateSlice,
+  type: E_TYPE
 }
 
 //  END:  payload interfaces
@@ -432,17 +437,8 @@ export interface IPlayer extends IPlayerSimple {
   rank: number,
   score: number,
   timePaused: number,
-  timePlayed: number
+  timePlayed: number,
   turns: number,
-}
-
-/**
- *
- */
-export interface IPlayerPlaying extends IPlayerSimple {
-  id: number,
-  name: string,
-  active: boolean
 }
 
 /**
@@ -451,7 +447,7 @@ export interface IPlayerPlaying extends IPlayerSimple {
 export interface IPlayerSimple extends IHasName {
   id: number,
   name: string,
-  active?: boolean
+  active: boolean
 }
 
 export type playerGameJoin = {
@@ -471,11 +467,11 @@ export interface IPlayerResult extends IPlayerSimple{
 export type gamePlayers = {
   index: number,
   all: IPlayer[],
-  playersSeatOrder: IPlayerPlaying[]
+  playersSeatOrder: IPlayerSimple[]
   finalResult?: ITurnComplete[]
 }
 
-export type gamePlayersAll = {
+export type playersAll = {
   index: number,
   players: IPlayerSimple[]
   playerGames: playerGameJoin[]
@@ -500,7 +496,7 @@ export type IRound = {
   firstPlayerID: number,
   index: number,
   leaderID?: number
-  playersInOrder: IPlayerPlaying[],
+  playersInOrder: IPlayerSimple[],
   playOrderIndex: number,
   turns: IRoundTurns,
   winnerID?: number,
@@ -562,10 +558,10 @@ export type ITurnRank = {
 
 
 export type IWholeScored = {
-  allPlayers: gamePlayersAll,
+  allPlayers: playersAll,
   defaultConfig: IConfigDefault
   currentGame: IGameActive,
-  pastGames: pastGames,
+  PastGames: PastGames,
 }
 
 
@@ -574,7 +570,7 @@ export type IWholeScored = {
 // START: unions declarations
 
 export type StateSlice = IConfigDefault | IConfigGame | IGame |
-                         IGame[] | IPause | gamePlayers | gamePlayersAll |
+                         IGame[] | IPause | gamePlayers | playersAll |
                          IRound | IRoundTurns | ITurnComplete[] |
                          ITurnRank | ITurnScore | number
 

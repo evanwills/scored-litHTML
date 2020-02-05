@@ -91,8 +91,15 @@ export const getRoundTurns : IGetTurns = (
  * @param playerID ID for the player we want the score total for
  * @param allScores All the scores from all the player
  */
-export const getTotalScore = (allScores: ITurnComplete[], playerID : number) => {
-  return allScores.reduce(getTotalScoreReducer(playerID), 0)
+export const getTotalScore = (playerID : number, allScores: ITurnComplete[]) => {
+  return allScores.filter(
+    // get all the turns for this player
+    (turn: ITurnComplete) => (turn.playerID === playerID)
+  ).reduce(
+    // accumulate the score
+    (oldTotal: number, turn: ITurnComplete) => (oldTotal + turn.score.round)
+    ,0
+  )
 }
 
 
@@ -102,19 +109,6 @@ export const getTotalScore = (allScores: ITurnComplete[], playerID : number) => 
 // START: local score related utilities
 
 
-
-/**
- * Generate a callback function that can be passed to Array.reduce()
- *
- * @param id ID of the player whose scores we want to sum
- */
-const getTotalScoreReducer  = (id : number) => (oldTotal:number, turn:ITurnComplete) => {
-  if (turn.playerID === id) {
-    return oldTotal + turn.score.round
-  } else {
-    return oldTotal
-  }
-}
 
 /**
  * get a callback function that can be passed to Array.sort()

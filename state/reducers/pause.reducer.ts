@@ -31,8 +31,8 @@ export const pauseReducer : Reducer = (state : IPause = initialPause, action : I
       }
 
     case GAME.RESUME:
-      if (action.payload.pausedSeconds > 0) {
-        const { now, pausedSeconds } = action.payload
+      if (action.payload.pauseDuration > 0) {
+        const { pauseDuration } = action.payload
         return {
           start: null,
           end: null,
@@ -42,11 +42,11 @@ export const pauseReducer : Reducer = (state : IPause = initialPause, action : I
             {
               error: false,
               mode: PAUSE_LOG_TYPE.RESUME,
-              time: now
+              time: action.meta.now
             }
           ],
           pauses: state.pauses,
-          totalPauseTime: state.totalPauseTime + pausedSeconds
+          totalPauseTime: state.totalPauseTime + pauseDuration
         }
       } else {
         return {

@@ -19,7 +19,7 @@ const scoredReducers = combineReducers({
     start: endReducer,
   }),
   defautlConfig: DefaultConfigReducer,
-  pastGames: pastGameReducer
+  PastGames: pastGameReducer
 })
 
 export default scoredReducers

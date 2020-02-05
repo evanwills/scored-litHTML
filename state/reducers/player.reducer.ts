@@ -1,10 +1,37 @@
 import { Reducer } from '../../node_modules/redux/index'
-import { gamePlayers, IAction, gamePlayersAll } from '../utilities/types'
-import { ALL_PLAYERS } from '../actions/player.action'
+import { gamePlayers, IAction, playersAll, IPlayerSimple } from '../utilities/types'
+import { ALL_PLAYERS, GAME_PLAYER } from '../actions/player.action'
+import { TURN } from '../actions/turns.action'
 
 
 
 export const gamePlayerReducer : Reducer = (state : gamePlayers , action: IAction) : gamePlayers => {
+  switch (action.type) {
+    case GAME_PLAYER.ADD:
+      const player : IPlayerSimple = action.payload.player
+      return {
+        ...state,
+        all: [
+          ...state.all,
+          {
+            ...player,
+            position: state.all.length + 2,
+            rank: 0,
+            score: 0,
+            timePaused: 0,
+            timePlayed: 0,
+            turns: 0,
+          }
+        ],
+        playersSeatOrder: [...state.playersSeatOrder, action.payload.player]
+      }
+
+
+      case GAME_PLAYER.UPDATE_NAME:
+      case GAME_PLAYER.REARRANGE:
+      case GAME_PLAYER.DEACTIVATE:
+      case GAME_PLAYER.UPDATE_SCORE:
+  }
   return state
 }
 
@@ -13,7 +40,7 @@ export const gamePlayerReducer : Reducer = (state : gamePlayers , action: IActio
  * @param state
  * @param action
  */
-export const allPlayerReducer : Reducer = (state : gamePlayersAll , action: IAction) : gamePlayersAll => {
+export const allPlayerReducer : Reducer = (state : playersAll , action: IAction) : playersAll => {
   switch (action.type) {
     case ALL_PLAYERS.ADD:
       const _index = state.index + 1

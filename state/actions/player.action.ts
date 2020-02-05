@@ -1,8 +1,9 @@
-import { IAction } from "../types"
+import { IAction, IPlayerSimple } from '../utilities/types'
 
 export const GAME_PLAYER = {
   ADD: 'Add player to game',
-  UPDATE: 'Update game player\'s name',
+  UPDATE_NAME: 'Update game player\'s name',
+  UPDATE_SCORE: 'Update player\'s score and rank',
   REARRANGE: 'Change the seating order of players',
   DEACTIVATE: 'Stop player from having turns'
 }
@@ -13,17 +14,16 @@ export const ALL_PLAYERS = {
   DELETE: 'Remove player from list'
 }
 
-export const addPlayerToGameAC = (_name, _position) : IAction => {
+export const addPlayerToGameAC = (_player: IPlayerSimple) : IAction => {
   return {
     type: GAME_PLAYER.ADD,
     payload: {
-      name: _name,
-      position: _position
+      player: _player
     }
   }
 }
 
-export const updatePlayerAC = (_id, _name, _position) : IAction => {
+export const updatePlayerAC = (_id : number, _name : string, _position: number) : IAction => {
   return {
     type: GAME_PLAYER.UPDATE,
     payload: {

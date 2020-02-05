@@ -1,7 +1,4 @@
-type errorType = {
-  message: string,
-  code: number
-}
+
 
 
 /**
@@ -22,35 +19,62 @@ type errorType = {
  *                  error codes
  */
 export const errorTypes = {
+  // ============================================
+  // START: recoverable errors
+
   // --------------------------------------------
   // START: Recoverable user input errors
 
   BAD_PLAYER_NAME: {
-    message: 'Player\'s name contained invalid characters or was too long (or both). Name has been cleand up before submission',
+    name: 'BAD_PLAYER_NAME',
+    message: 'Player\'s name contained invalid characters or was too long (or both). Name has been cleand up before submission. Using: "{{1}}"',
     code: 100
   },
 
   //  END:  Recoverable user input errors
   // --------------------------------------------
-  // START: Unrecoverable user input errors
-
-  DUPLICATE_PLAYER_NAME: {
-    message: 'A player with the same name already exists in the system.',
-    code: 150
-  }
-
-  //  END: Unrecoverable user input errors
-  // --------------------------------------------
-
-
-  // --------------------------------------------
   // START: Recoverable system errors
+
+  PLAYER_ALREADY_ADDED: {
+    name: 'PLAYER_ALREADY_ADDED',
+    message: 'Player "{{1}}" (#{{2}}) has already been added to the game.',
+    code: 150
+  },
+  CANT_ADD_INACTIVE_PLAYER: {
+    name: 'CANT_ADD_INACTIVE_PLAYER',
+    message: 'Cannot add an inactive player "{{1}}" (#{{2}}) to the game',
+    code: 151
+  },
 
   //  END:  Recoverable system errors
   // --------------------------------------------
+
+
+  //  END:  recoverable errors
+  // ============================================
+  // START: unrecoverable errors
+
+
+  // --------------------------------------------
+  // START: Unrecoverable user input errors
+
+  DUPLICATE_PLAYER_NAME: {
+    name: 'DUPLICATE_PLAYER_NAME',
+    message: 'A player with the name "{{1}}" (#{{2}}) already exists in the system.',
+    code: 200
+  },
+
+  //  END: Unrecoverable user input errors
+  // --------------------------------------------
   // START: Unrecoverable system errors
 
-  //  END: Unrecoverable system errors
+  PLAYER_NOT_FOUND: {
+    name: 'PLAYER_NOT_FOUND',
+    message: 'Could not find player matching the specified ID: {{1}}',
+    code: 250
+  }
+
+  //  END:  Unrecoverable system errors
   // --------------------------------------------
 
 
@@ -59,10 +83,15 @@ export const errorTypes = {
 
   //  END:  HTTP errors
   // --------------------------------------------
+
+  //  END:  unrecoverable errors
+  // ============================================
 }
 
-
-export enum ERROR_TYPES {
+export enum E_TYPE {
   BAD_PLAYER_NAME,
-  DUPLICATE_PLAYER_NAME
+  PLAYER_ALREADY_ADDED,
+  CANT_ADD_INACTIVE_PLAYER,
+  DUPLICATE_PLAYER_NAME,
+  PLAYER_NOT_FOUND
 }

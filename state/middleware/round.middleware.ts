@@ -17,8 +17,8 @@ export const roundMiddleWare : Middleware = (store : Store) => (next) => (action
           payload: {
             ...action.payload,
             totalScore: getTotalScore(
-              scores,
-              round.turns.current.playerID
+              round.turns.current.playerID,
+              scores
             )
           },
           error: action.error,
@@ -27,12 +27,8 @@ export const roundMiddleWare : Middleware = (store : Store) => (next) => (action
             dispatched: true // particular action before
           }
         })
-        // Now that the score has been processed, we can end the turn
 
-        /**
-         * The most up-to-date total score for the current player
-         */
-        const totalScore =
+        // Now that the score has been processed, we can end the turn
         store.dispatch(endTurnAC())
 
         if (end === null) {
